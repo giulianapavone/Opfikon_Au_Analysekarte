@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Opfikon Au, Analysekarte</title>
+<title>Opfikon Au, Analysekarte1</title>
 <style>
 * {
   margin: 0;
@@ -16,6 +16,13 @@ body {
   font-family: sans-serif;
   height: 100vh;
   background: #fff;
+}
+
+/* Gesamtlayout: Karte links, Sidebar rechts */
+#content {
+  display: flex;
+  flex: 1;
+  height: 100%;
 }
 
 /* Linke Spalte: Karte */
@@ -58,7 +65,6 @@ body {
   flex-direction: column;
   background: #fff;
   padding: 4px;
-  margin: 0;
 }
 
 #buttons {
@@ -117,18 +123,16 @@ body {
   margin-right: 5px;
 }
 
-/* Unterer Bereich: Quellen + Karteninfos */
+/* Unterer Bereich: Quellen + Karteninfos (außerhalb der Karte) */
 #footer-info {
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
-  padding: 10px 20px;
+  padding: 20px 40px;
   font-size: 13px;
   color: #333;
   border-top: 1px solid #ccc;
   background: #f7f7f7;
-  position: relative;
-  margin-top: 1000px; /* sorgt dafür, dass man scrollen kann */
 }
 
 #footer-info .sources {
@@ -144,54 +148,57 @@ body {
 </head>
 <body>
 
-<!-- Linke Seite: Karte -->
-<div id="map-container">
-  <img src="Analysekarte-Basekarte.png" class="layer" id="Analysekarte-Basekarte">
-  <img src="Analysekarte-Bauzonen.png" class="layer" id="Analysekarte-Bauzonen">
-  <img src="Analysekarte-Strassenlärm.png" class="layer" id="Analysekarte-Strassenlärm">
-  <img src="Analysekarte-Glatt.png" class="layer" id="Analysekarte-Glatt">
-  <img src="Analysekarte-Gebäudealter.png" class="layer" id="Analysekarte-Gebäudealter">
-  <img src="Analysekarte-Fusswege.png" class="layer" id="Analysekarte-Fusswege">
-  <img src="Analysekarte-Velowege.png" class="layer" id="Analysekarte-Velowege">
-  <img src="Analysekarte-Fluglärm.png" class="layer" id="Analysekarte-Fluglärm">
-  <img src="Analysekarte-Unfälle.png" class="layer" id="Analysekarte-Unfälle">
-  <img src="Analysekarte-Fussgängerstreifen.png" class="layer" id="Analysekarte-Fussgängerstreifen">
-  <img src="Analysekarte-Busstationen.png" class="layer" id="Analysekarte-Busstationen">
+<!-- Hauptinhalt: Karte + Sidebar -->
+<div id="content">
+  <!-- Karte -->
+  <div id="map-container">
+    <img src="Analysekarte-Basekarte.png" class="layer" id="Analysekarte-Basekarte">
+    <img src="Analysekarte-Bauzonen.png" class="layer" id="Analysekarte-Bauzonen">
+    <img src="Analysekarte-Strassenlärm.png" class="layer" id="Analysekarte-Strassenlärm">
+    <img src="Analysekarte-Glatt.png" class="layer" id="Analysekarte-Glatt">
+    <img src="Analysekarte-Gebäudealter.png" class="layer" id="Analysekarte-Gebäudealter">
+    <img src="Analysekarte-Fusswege.png" class="layer" id="Analysekarte-Fusswege">
+    <img src="Analysekarte-Velowege.png" class="layer" id="Analysekarte-Velowege">
+    <img src="Analysekarte-Fluglärm.png" class="layer" id="Analysekarte-Fluglärm">
+    <img src="Analysekarte-Unfälle.png" class="layer" id="Analysekarte-Unfälle">
+    <img src="Analysekarte-Fussgängerstreifen.png" class="layer" id="Analysekarte-Fussgängerstreifen">
+    <img src="Analysekarte-Busstationen.png" class="layer" id="Analysekarte-Busstationen">
+  </div>
 
-  <!-- Neuer Bereich unten -->
-  <div id="footer-info">
-    <div class="sources">
-      <strong>Quellen:</strong><br>
-      Bundesamt für Statistik (BFS)<br>
-      OpenStreetMap (OSM)<br>
-      Stadt Opfikon, GIS-Daten 2024
+  <!-- Sidebar -->
+  <div id="sidebar">
+    <div id="buttons">
+      <button onclick="toggleLayer('Analysekarte-Bauzonen', this)">Bauzonen</button>
+      <button onclick="toggleLayer('Analysekarte-Gebäudealter', this)">Gebäudealter</button>
+      <button onclick="toggleLayer('Analysekarte-Strassenlärm', this)">Strassenlärm</button>
+      <button onclick="toggleLayer('Analysekarte-Fluglärm', this)">Fluglärm</button>
+      <button onclick="toggleLayer('Analysekarte-Fusswege', this)">Fusswege</button>
+      <button onclick="toggleLayer('Analysekarte-Fussgängerstreifen', this)">Fussgängerstreifen</button>
+      <button onclick="toggleLayer('Analysekarte-Velowege', this)">Velowege</button>
+      <button onclick="toggleLayer('Analysekarte-Busstationen', this)">Busstationen</button>
+      <button onclick="toggleLayer('Analysekarte-Unfälle', this)">Unfälle</button>
     </div>
-    <div class="map-info">
-      <strong>Karteninformationen:</strong><br>
-      Erstellungsdatum: 2024<br>
-      Massstab: 1:5'000<br>
-      Projektion: CH1903+ / LV95
+
+    <div id="legend-container">
+      <h3>Legende</h3>
+      <ul id="legend-list"></ul>
     </div>
   </div>
 </div>
 
-<!-- Rechte Seite: Buttons + Legende -->
-<div id="sidebar">
-  <div id="buttons">
-    <button onclick="toggleLayer('Analysekarte-Bauzonen', this)">Bauzonen</button>
-    <button onclick="toggleLayer('Analysekarte-Gebäudealter', this)">Gebäudealter</button>
-    <button onclick="toggleLayer('Analysekarte-Strassenlärm', this)">Strassenlärm</button>
-    <button onclick="toggleLayer('Analysekarte-Fluglärm', this)">Fluglärm</button>
-    <button onclick="toggleLayer('Analysekarte-Fusswege', this)">Fusswege</button>
-    <button onclick="toggleLayer('Analysekarte-Fussgängerstreifen', this)">Fussgängerstreifen</button>
-    <button onclick="toggleLayer('Analysekarte-Velowege', this)">Velowege</button>
-    <button onclick="toggleLayer('Analysekarte-Busstationen', this)">Busstationen</button>
-    <button onclick="toggleLayer('Analysekarte-Unfälle', this)">Unfälle</button>
+<!-- Unterer Bereich außerhalb der Karte -->
+<div id="footer-info">
+  <div class="sources">
+    <strong>Quellen:</strong><br>
+    Bundesamt für Statistik (BFS)<br>
+    OpenStreetMap (OSM)<br>
+    Stadt Opfikon, GIS-Daten 2024
   </div>
-
-  <div id="legend-container">
-    <h3>Legende</h3>
-    <ul id="legend-list"></ul>
+  <div class="map-info">
+    <strong>Karteninformationen:</strong><br>
+    Erstellungsdatum: 2024<br>
+    Massstab: 1:5'000<br>
+    Projektion: CH1903+ / LV95
   </div>
 </div>
 
