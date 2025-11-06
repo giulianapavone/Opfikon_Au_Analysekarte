@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Opfikon Au, Analysekarte1</title>
+<title>Opfikon Au, Analysekarte</title>
 <style>
 * {
   margin: 0;
@@ -13,29 +13,29 @@
 
 body {
   display: flex;
+  flex-direction: row;
   font-family: sans-serif;
-  height: 100vh;
   background: #fff;
+  height: 100vh;
+  overflow: hidden;
 }
 
-/* Gesamtlayout: Karte links, Sidebar rechts */
-#content {
+/* Linke Hauptspalte: Karte + Footer */
+#main-column {
   display: flex;
+  flex-direction: column;
   flex: 1;
-  height: 100%;
-}
-
-/* Linke Spalte: Karte */
-#map-container {
-  flex: 1;
-  position: relative;
   overflow-y: auto;
   background: #fff;
-  margin: 0;
-  padding: 0;
 }
 
-/* Kartenlayer */
+/* Karte selbst */
+#map-container {
+  position: relative;
+  background: #fff;
+  min-height: 1000px; /* simuliert lange Karte zum Scrollen */
+}
+
 .layer {
   position: absolute;
   top: 0;
@@ -58,13 +58,14 @@ body {
 #Analysekarte-Fussgängerstreifen { z-index: 9; }
 #Analysekarte-Busstationen { z-index: 10; }
 
-/* Rechte Spalte: Buttons + Legende */
+/* Rechte Spalte: Sidebar */
 #sidebar {
   width: 200px;
   display: flex;
   flex-direction: column;
   background: #fff;
   padding: 4px;
+  border-left: 1px solid #ddd;
 }
 
 #buttons {
@@ -123,16 +124,17 @@ body {
   margin-right: 5px;
 }
 
-/* Unterer Bereich: Quellen + Karteninfos (außerhalb der Karte) */
+/* Unterer Bereich: NUR unter der Karte */
 #footer-info {
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
-  padding: 20px 40px;
+  padding: 20px 30px;
   font-size: 13px;
   color: #333;
   border-top: 1px solid #ccc;
   background: #f7f7f7;
+  flex-shrink: 0;
 }
 
 #footer-info .sources {
@@ -148,9 +150,8 @@ body {
 </head>
 <body>
 
-<!-- Hauptinhalt: Karte + Sidebar -->
-<div id="content">
-  <!-- Karte -->
+<!-- Linke Spalte: Karte + Footer -->
+<div id="main-column">
   <div id="map-container">
     <img src="Analysekarte-Basekarte.png" class="layer" id="Analysekarte-Basekarte">
     <img src="Analysekarte-Bauzonen.png" class="layer" id="Analysekarte-Bauzonen">
@@ -165,40 +166,40 @@ body {
     <img src="Analysekarte-Busstationen.png" class="layer" id="Analysekarte-Busstationen">
   </div>
 
-  <!-- Sidebar -->
-  <div id="sidebar">
-    <div id="buttons">
-      <button onclick="toggleLayer('Analysekarte-Bauzonen', this)">Bauzonen</button>
-      <button onclick="toggleLayer('Analysekarte-Gebäudealter', this)">Gebäudealter</button>
-      <button onclick="toggleLayer('Analysekarte-Strassenlärm', this)">Strassenlärm</button>
-      <button onclick="toggleLayer('Analysekarte-Fluglärm', this)">Fluglärm</button>
-      <button onclick="toggleLayer('Analysekarte-Fusswege', this)">Fusswege</button>
-      <button onclick="toggleLayer('Analysekarte-Fussgängerstreifen', this)">Fussgängerstreifen</button>
-      <button onclick="toggleLayer('Analysekarte-Velowege', this)">Velowege</button>
-      <button onclick="toggleLayer('Analysekarte-Busstationen', this)">Busstationen</button>
-      <button onclick="toggleLayer('Analysekarte-Unfälle', this)">Unfälle</button>
+  <!-- Fußbereich NUR unter der Karte -->
+  <div id="footer-info">
+    <div class="sources">
+      <strong>Quellen:</strong><br>
+      Bundesamt für Statistik (BFS)<br>
+      OpenStreetMap (OSM)<br>
+      Stadt Opfikon, GIS-Daten 2024
     </div>
-
-    <div id="legend-container">
-      <h3>Legende</h3>
-      <ul id="legend-list"></ul>
+    <div class="map-info">
+      <strong>Karteninformationen:</strong><br>
+      Erstellungsdatum: 2024<br>
+      Massstab: 1:5'000<br>
+      Projektion: CH1903+ / LV95
     </div>
   </div>
 </div>
 
-<!-- Unterer Bereich außerhalb der Karte -->
-<div id="footer-info">
-  <div class="sources">
-    <strong>Quellen:</strong><br>
-    Bundesamt für Statistik (BFS)<br>
-    OpenStreetMap (OSM)<br>
-    Stadt Opfikon, GIS-Daten 2024
+<!-- Rechte Spalte: Sidebar -->
+<div id="sidebar">
+  <div id="buttons">
+    <button onclick="toggleLayer('Analysekarte-Bauzonen', this)">Bauzonen</button>
+    <button onclick="toggleLayer('Analysekarte-Gebäudealter', this)">Gebäudealter</button>
+    <button onclick="toggleLayer('Analysekarte-Strassenlärm', this)">Strassenlärm</button>
+    <button onclick="toggleLayer('Analysekarte-Fluglärm', this)">Fluglärm</button>
+    <button onclick="toggleLayer('Analysekarte-Fusswege', this)">Fusswege</button>
+    <button onclick="toggleLayer('Analysekarte-Fussgängerstreifen', this)">Fussgängerstreifen</button>
+    <button onclick="toggleLayer('Analysekarte-Velowege', this)">Velowege</button>
+    <button onclick="toggleLayer('Analysekarte-Busstationen', this)">Busstationen</button>
+    <button onclick="toggleLayer('Analysekarte-Unfälle', this)">Unfälle</button>
   </div>
-  <div class="map-info">
-    <strong>Karteninformationen:</strong><br>
-    Erstellungsdatum: 2024<br>
-    Massstab: 1:5'000<br>
-    Projektion: CH1903+ / LV95
+
+  <div id="legend-container">
+    <h3>Legende</h3>
+    <ul id="legend-list"></ul>
   </div>
 </div>
 
