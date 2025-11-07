@@ -5,54 +5,71 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Opfikon Au, Analysekarte</title>
   <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; }
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
 
     body {
       display: flex;
+      flex-direction: row;
       font-family: sans-serif;
+      background: #fff;
       height: 100vh;
       overflow: hidden;
-      background: #fff;
     }
 
-    /* Left column: map */
+    /* Linke Hauptspalte: Karte */
     #main-column {
+      display: flex;
+      flex-direction: column;
       flex: 1;
+      overflow-y: auto;
       background: #fff;
-      overflow: hidden;
-      position: relative;
+      align-items: center; /* center map horizontally */
     }
 
+    /* Zoom controls */
+    #map-controls {
+      margin: 4px 0;
+      text-align: center;
+    }
+    #map-controls button {
+      margin: 0 4px;
+      padding: 2px 6px;
+      font-size: 14px;
+      cursor: pointer;
+    }
+
+    /* Map container */
     #map-container {
-      width: 100%;
-      height: 100%;
-      overflow: hidden;
-      cursor: grab;
       position: relative;
-      background: #fff;
+      width: 100%;
+      display: flex;
+      justify-content: center; /* center map-inner */
     }
 
+    /* Inner wrapper for scaling */
     #map-inner {
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      width: 1834px;  /* original PNG width */
-      height: 2321px; /* original PNG height */
-      transform-origin: center center;
-      transition: transform 0.05s linear;
+      position: relative;
+      width: 100%;
+      min-width: 80%;
+      max-width: 150%;
+      transform-origin: center top;
     }
 
+    /* Layers */
     .layer {
       position: absolute;
       top: 0;
       left: 0;
       width: 100%;
-      height: 100%;
-      object-fit: contain;
+      height: auto;
       display: none;
     }
 
-    /* Layer Z-order */
+    /* Layer-Z Reihenfolge */
     #Analysekarte-Bauzonen { z-index: 0; }
     #Analysekarte-Strassenlärm { z-index: 1; }
     #Analysekarte-Glatt { z-index: 2; display: block; }
@@ -65,7 +82,7 @@
     #Analysekarte-Fussgängerstreifen { z-index: 9; }
     #Analysekarte-Busstationen { z-index: 10; }
 
-    /* Right sidebar */
+    /* Rechte Spalte: Sidebar */
     #sidebar {
       width: 200px;
       display: flex;
@@ -98,10 +115,17 @@
       color: white;
     }
 
+    /* Legende */
     #legend-container {
       flex: 1;
       overflow-y: auto;
+      margin: 0;
       padding-top: 2px;
+    }
+
+    #legend-container h3 {
+      margin: 0 0 2px 0;
+      padding: 0;
     }
 
     #legend-list {
@@ -127,8 +151,16 @@
 </head>
 <body>
 
-  <!-- Left: map -->
+  <!-- Linke Spalte: Karte -->
   <div id="main-column">
+
+    <!-- Zoom Controls -->
+    <div id="map-controls">
+      <button onclick="zoomMap(-10)">-</button>
+      <button onclick="zoomMap(10)">+</button>
+    </div>
+
+    <!-- Map container -->
     <div id="map-container">
       <div id="map-inner">
         <img src="Analysekarte-Basekarte.png" class="layer" id="Analysekarte-Basekarte">
@@ -146,7 +178,7 @@
     </div>
   </div>
 
-  <!-- Right sidebar -->
+  <!-- Rechte Spalte: Sidebar -->
   <div id="sidebar">
     <div id="buttons">
       <button onclick="toggleLayer('Analysekarte-Bauzonen', this)">Bauzonen</button>
@@ -167,10 +199,21 @@
   </div>
 
   <script>
-    // === Layer toggle & legend ===
+    // Zoom
+    let zoom = 100; // percent
+    function zoomMap(change) {
+      zoom += change;
+      if (zoom < 80) zoom = 80;
+      if (zoom > 150) zoom = 150;
+
+      const mapInner = document.getElementById('map-inner');
+      mapInner.style.transform = `scale(${zoom/100})`;
+    }
+
+    // Layer toggling
     function toggleLayer(id, button) {
       const el = document.getElementById(id);
-      if(el.style.display === 'block') {
+      if (el.style.display === 'block') {
         el.style.display = 'none';
         button.classList.remove('active');
       } else {
@@ -180,16 +223,53 @@
       updateLegend();
     }
 
+    // Layer legends
     const layerLegends = {
-      "Analysekarte-Bauzonen":[ {label:"Wohngebiet", color:"#FFAAAA"}, {label:"Gewerbe", color:"#FFCCAA"}, {label:"Industrie", color:"#FF8888"} ],
-      "Analysekarte-Strassenlärm":[ {label:"Lärmzone hoch", color:"#FF0000"}, {label:"Lärmzone mittel", color:"#FF5555"}, {label:"Lärmzone niedrig", color:"#FFAAAA"} ],
-      "Analysekarte-Gebäudealter":[ {label:"Altbau", color:"#8B4513"}, {label:"Mittelbau", color:"#CD853F"}, {label:"Neubau", color:"#DEB887"} ],
-      "Analysekarte-Fusswege":[ {label:"Fussgängerzone", color:"#FFD700"}, {label:"Platz", color:"#FFFF66"}, {label:"Durchgang", color:"#FFE066"} ],
-      "Analysekarte-Velowege":[ {label:"Veloweg", color:"#00BFFF"}, {label:"Shared Bike", color:"#3399FF"}, {label:"Fahrradstraße", color:"#66CCFF"} ],
-      "Analysekarte-Fluglärm":[ {label:"Lärmzone hoch", color:"#C0C0C0"}, {label:"Lärmzone mittel", color:"#A0A0A0"}, {label:"Lärmzone niedrig", color:"#909090"} ],
-      "Analysekarte-Unfälle":[ {label:"Unfallort", color:"#FF4500"}, {label:"Unfallhäufig", color:"#FF6347"}, {label:"Gefahrenstelle", color:"#FF7F50"} ],
-      "Analysekarte-Fussgängerstreifen":[ {label:"Zebrastreifen", color:"#FFFFFF"}, {label:"Ampelkreuzung", color:"#EEEEEE"}, {label:"Warnung", color:"#DDDDDD"} ],
-      "Analysekarte-Busstationen":[ {label:"Bushaltestelle", color:"#32CD32"}, {label:"Buslinie", color:"#3CB371"}, {label:"Wartebereich", color:"#66CDAA"} ]
+      "Analysekarte-Bauzonen": [
+        { label: "Wohngebiet", color: "#FFAAAA" },
+        { label: "Gewerbe", color: "#FFCCAA" },
+        { label: "Industrie", color: "#FF8888" }
+      ],
+      "Analysekarte-Strassenlärm": [
+        { label: "Lärmzone hoch", color: "#FF0000" },
+        { label: "Lärmzone mittel", color: "#FF5555" },
+        { label: "Lärmzone niedrig", color: "#FFAAAA" }
+      ],
+      "Analysekarte-Gebäudealter": [
+        { label: "Altbau", color: "#8B4513" },
+        { label: "Mittelbau", color: "#CD853F" },
+        { label: "Neubau", color: "#DEB887" }
+      ],
+      "Analysekarte-Fusswege": [
+        { label: "Fussgängerzone", color: "#FFD700" },
+        { label: "Platz", color: "#FFFF66" },
+        { label: "Durchgang", color: "#FFE066" }
+      ],
+      "Analysekarte-Velowege": [
+        { label: "Veloweg", color: "#00BFFF" },
+        { label: "Shared Bike", color: "#3399FF" },
+        { label: "Fahrradstraße", color: "#66CCFF" }
+      ],
+      "Analysekarte-Fluglärm": [
+        { label: "Lärmzone hoch", color: "#C0C0C0" },
+        { label: "Lärmzone mittel", color: "#A0A0A0" },
+        { label: "Lärmzone niedrig", color: "#909090" }
+      ],
+      "Analysekarte-Unfälle": [
+        { label: "Unfallort", color: "#FF4500" },
+        { label: "Unfallhäufig", color: "#FF6347" },
+        { label: "Gefahrenstelle", color: "#FF7F50" }
+      ],
+      "Analysekarte-Fussgängerstreifen": [
+        { label: "Zebrastreifen", color: "#FFFFFF" },
+        { label: "Ampelkreuzung", color: "#EEEEEE" },
+        { label: "Warnung", color: "#DDDDDD" }
+      ],
+      "Analysekarte-Busstationen": [
+        { label: "Bushaltestelle", color: "#32CD32" },
+        { label: "Buslinie", color: "#3CB371" },
+        { label: "Wartebereich", color: "#66CDAA" }
+      ]
     };
 
     function updateLegend() {
@@ -197,7 +277,7 @@
       legendList.innerHTML = '';
       Object.keys(layerLegends).forEach(layerId => {
         const el = document.getElementById(layerId);
-        if(el.style.display === 'block') {
+        if (el.style.display === 'block') {
           layerLegends[layerId].forEach(item => {
             const li = document.createElement('li');
             li.innerHTML = `<span style="background:${item.color};"></span>${item.label}`;
@@ -207,70 +287,9 @@
       });
     }
 
+    // Show base layers initially
     document.getElementById('Analysekarte-Basekarte').style.display = 'block';
-    updateLegend();
-
-    // === Zoom + Pan ===
-    const mapInner = document.getElementById('map-inner');
-    const mapContainer = document.getElementById('map-container');
-    let scale = 1;
-    let translateX = 0;
-    let translateY = 0;
-    let isDragging = false;
-    let lastX, lastY;
-
-    // Calculate initial scale to fit width
-    function setInitialScale() {
-      const containerWidth = mapContainer.clientWidth;
-      scale = containerWidth / 1834; // 1834 = original PNG width
-      scale = Math.min(Math.max(0.5, scale), 2); // clamp between 0.5x and 2x
-      updateTransform();
-    }
-
-    function updateTransform() {
-      mapInner.style.transform = `translate(-50%, -50%) translate(${translateX}px, ${translateY}px) scale(${scale})`;
-    }
-
-    mapContainer.addEventListener('wheel', e => {
-      e.preventDefault();
-      const zoomSpeed = 0.05;
-      const newScale = scale + (e.deltaY < 0 ? zoomSpeed : -zoomSpeed);
-      scale = Math.min(Math.max(0.5, newScale), 2);
-      updateTransform();
-    });
-
-    mapContainer.addEventListener('mousedown', e => {
-      isDragging = true;
-      mapContainer.style.cursor = 'grabbing';
-      lastX = e.clientX;
-      lastY = e.clientY;
-    });
-
-    mapContainer.addEventListener('mousemove', e => {
-      if(!isDragging) return;
-      const dx = e.clientX - lastX;
-      const dy = e.clientY - lastY;
-      translateX += dx;
-      translateY += dy;
-      lastX = e.clientX;
-      lastY = e.clientY;
-      updateTransform();
-    });
-
-    mapContainer.addEventListener('mouseup', () => {
-      isDragging = false;
-      mapContainer.style.cursor = 'grab';
-    });
-
-    mapContainer.addEventListener('mouseleave', () => {
-      isDragging = false;
-      mapContainer.style.cursor = 'grab';
-    });
-
-    window.addEventListener('resize', setInitialScale);
-
-    // Initialize
-    setInitialScale();
+    document.getElementById('Analysekarte-Glatt').style.display = 'block';
   </script>
 
 </body>
