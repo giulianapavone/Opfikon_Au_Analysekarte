@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Opfikon Au, Analysekarte</title>
+<title>Opfikon Au, Analysekarte1</title>
 <style>
 * {
   margin: 0;
@@ -33,7 +33,7 @@ body {
 #map-container {
   position: relative;
   background: #fff;
-  padding-bottom: 0;
+  padding-bottom: 1000px;
 }
 
 /* Layer */
@@ -281,32 +281,6 @@ function updateLegend() {
 }
 
 document.getElementById('Analysekarte-Basekarte').style.display = 'block';
-
-// ---- NEUER CODE: Höhe des Containers automatisch anpassen ----
-window.addEventListener("load", function() {
-  const mapContainer = document.getElementById("map-container");
-  const layers = document.querySelectorAll(".layer");
-  
-  const referenceLayer = Array.from(layers).find(img => img.complete) || layers[0];
-  
-  if (referenceLayer) {
-    if (!referenceLayer.complete) {
-      referenceLayer.onload = setContainerHeight;
-    } else {
-      setContainerHeight();
-    }
-  }
-
-  function setContainerHeight() {
-    mapContainer.style.height = referenceLayer.naturalHeight + "px";
-  }
-
-  // Optional: bei Fensteränderung neu berechnen
-  window.addEventListener("resize", () => {
-    setContainerHeight();
-  });
-});
-</script>
 
 </body>
 </html>
