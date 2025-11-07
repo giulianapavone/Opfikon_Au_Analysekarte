@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Opfikon Au, Analysekarte1</title>
+<title>Opfikon Au, Analysekarte</title>
 <style>
 * {
   margin: 0;
@@ -32,8 +32,8 @@ body {
 /* Karte selbst */
 #map-container {
   position: relative;
+  width: 100%;
   background: #fff;
-  padding-bottom: 1000px;
 }
 
 /* Layer */
@@ -46,15 +46,21 @@ body {
   display: none;
 }
 
+/* Die sichtbare Basiskarte legt die Höhe des Containers fest */
+#map-container img#Analysekarte-Basekarte {
+  position: static;
+  display: block;
+}
+
 /* Layer-Z Reihenfolge */
 #Analysekarte-Bauzonen { z-index: 0; }
 #Analysekarte-Strassenlärm { z-index: 1; }
-#Analysekarte-Glatt { z-index: 2; display: block; }
+#Analysekarte-Glatt { z-index: 2; }
 #Analysekarte-Gebäudealter { z-index: 3; }
 #Analysekarte-Fusswege { z-index: 4; }
 #Analysekarte-Velowege { z-index: 5; }
 #Analysekarte-Fluglärm { z-index: 6; }
-#Analysekarte-Basekarte { z-index: 7; display: block; }
+#Analysekarte-Basekarte { z-index: 7; }
 #Analysekarte-Unfälle { z-index: 8; }
 #Analysekarte-Fussgängerstreifen { z-index: 9; }
 #Analysekarte-Busstationen { z-index: 10; }
@@ -281,6 +287,6 @@ function updateLegend() {
 }
 
 document.getElementById('Analysekarte-Basekarte').style.display = 'block';
-
+</script>
 </body>
 </html>
