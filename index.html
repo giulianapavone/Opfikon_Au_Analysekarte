@@ -43,7 +43,7 @@
       position: relative;
       width: 100%;
       min-width: 50%;
-      max-width: 150%;
+      max-width: 200%;
       transform-origin: center top;
     }
 
@@ -188,8 +188,9 @@
 
     <!-- Zoom buttons above layer buttons -->
     <div id="zoom-controls">
-      <button onclick="zoomMap(-10)">-</button>
-      <button onclick="zoomMap(10)">+</button>
+      <button onclick="zoomMap(-5)">-</button>
+      <button onclick="zoomDefault()">100%</button>
+      <button onclick="zoomMap(5)">+</button>
     </div>
 
     <div id="buttons">
@@ -213,11 +214,17 @@
   <script>
     // Zoom
     let zoom = 100; // percent
+
     function zoomMap(change) {
       zoom += change;
-      if (zoom < 50) zoom = 50;   // new min zoom
-      if (zoom > 150) zoom = 150; // max zoom
+      if (zoom < 50) zoom = 50;   // min zoom
+      if (zoom > 200) zoom = 200; // max zoom
       document.getElementById('map-inner').style.transform = `scale(${zoom/100})`;
+    }
+
+    function zoomDefault() {
+      zoom = 100;
+      document.getElementById('map-inner').style.transform = `scale(1)`;
     }
 
     // Layer toggling
