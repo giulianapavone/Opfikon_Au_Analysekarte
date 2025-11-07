@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Opfikon Au, Analysekarte</title>
+<title>Opfikon Au, Analysekarte1</title>
 <style>
 * {
   margin: 0;
@@ -32,37 +32,28 @@ body {
 /* Karte selbst */
 #map-container {
   position: relative;
-  width: 100%;
   background: #fff;
-  line-height: 0; /* prevents gaps under image */
 }
 
-/* Die Basiskarte definiert die Höhe */
-#map-container img#Analysekarte-Basekarte {
-  width: 100%;
-  height: auto;
-  display: block;
-}
-
-/* Layer: exakt über der Basiskarte gestapelt */
+/* Layer */
 .layer {
   position: absolute;
   top: 0;
   left: 0;
   width: 100%;
-  height: 100%;
+  height: auto;
   display: none;
-  object-fit: cover;
 }
 
 /* Layer-Z Reihenfolge */
-#Analysekarte-Bauzonen { z-index: 1; }
-#Analysekarte-Strassenlärm { z-index: 2; }
-#Analysekarte-Glatt { z-index: 3; }
-#Analysekarte-Gebäudealter { z-index: 4; }
-#Analysekarte-Fusswege { z-index: 5; }
-#Analysekarte-Velowege { z-index: 6; }
-#Analysekarte-Fluglärm { z-index: 7; }
+#Analysekarte-Bauzonen { z-index: 0; }
+#Analysekarte-Strassenlärm { z-index: 1; }
+#Analysekarte-Glatt { z-index: 2; display: block; }
+#Analysekarte-Gebäudealter { z-index: 3; }
+#Analysekarte-Fusswege { z-index: 4; }
+#Analysekarte-Velowege { z-index: 5; }
+#Analysekarte-Fluglärm { z-index: 6; }
+#Analysekarte-Basekarte { z-index: 7; display: block; }
 #Analysekarte-Unfälle { z-index: 8; }
 #Analysekarte-Fussgängerstreifen { z-index: 9; }
 #Analysekarte-Busstationen { z-index: 10; }
@@ -162,7 +153,7 @@ body {
 <!-- Linke Spalte: Karte + Footer -->
 <div id="main-column">
   <div id="map-container">
-    <img src="Analysekarte-Basekarte.png" id="Analysekarte-Basekarte">
+    <img src="Analysekarte-Basekarte.png" class="layer" id="Analysekarte-Basekarte">
     <img src="Analysekarte-Bauzonen.png" class="layer" id="Analysekarte-Bauzonen">
     <img src="Analysekarte-Strassenlärm.png" class="layer" id="Analysekarte-Strassenlärm">
     <img src="Analysekarte-Glatt.png" class="layer" id="Analysekarte-Glatt">
@@ -289,6 +280,6 @@ function updateLegend() {
 }
 
 document.getElementById('Analysekarte-Basekarte').style.display = 'block';
-</script>
+
 </body>
 </html>
