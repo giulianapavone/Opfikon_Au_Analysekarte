@@ -30,18 +30,6 @@
       align-items: center; /* center map horizontally */
     }
 
-    /* Zoom controls */
-    #map-controls {
-      margin: 4px 0;
-      text-align: center;
-    }
-    #map-controls button {
-      margin: 0 4px;
-      padding: 2px 6px;
-      font-size: 14px;
-      cursor: pointer;
-    }
-
     /* Map container */
     #map-container {
       position: relative;
@@ -54,7 +42,7 @@
     #map-inner {
       position: relative;
       width: 100%;
-      min-width: 80%;
+      min-width: 50%;
       max-width: 150%;
       transform-origin: center top;
     }
@@ -92,6 +80,29 @@
       border-left: 1px solid #ddd;
     }
 
+    /* Zoom buttons */
+    #zoom-controls {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 4px;
+    }
+
+    #zoom-controls button {
+      flex: 1;
+      margin: 0 2px;
+      padding: 2px 0;
+      font-size: 12px; /* smaller than layer buttons */
+      cursor: pointer;
+      border: none;
+      border-radius: 4px;
+      background-color: #ccc;
+    }
+
+    #zoom-controls button:hover {
+      background-color: #bbb;
+    }
+
+    /* Layer toggle buttons */
     #buttons {
       position: sticky;
       top: 0;
@@ -115,7 +126,7 @@
       color: white;
     }
 
-    /* Legende */
+    /* Legend */
     #legend-container {
       flex: 1;
       overflow-y: auto;
@@ -154,12 +165,6 @@
   <!-- Linke Spalte: Karte -->
   <div id="main-column">
 
-    <!-- Zoom Controls -->
-    <div id="map-controls">
-      <button onclick="zoomMap(-10)">-</button>
-      <button onclick="zoomMap(10)">+</button>
-    </div>
-
     <!-- Map container -->
     <div id="map-container">
       <div id="map-inner">
@@ -180,6 +185,13 @@
 
   <!-- Rechte Spalte: Sidebar -->
   <div id="sidebar">
+
+    <!-- Zoom buttons above layer buttons -->
+    <div id="zoom-controls">
+      <button onclick="zoomMap(-10)">-</button>
+      <button onclick="zoomMap(10)">+</button>
+    </div>
+
     <div id="buttons">
       <button onclick="toggleLayer('Analysekarte-Bauzonen', this)">Bauzonen</button>
       <button onclick="toggleLayer('Analysekarte-Gebäudealter', this)">Gebäudealter</button>
@@ -203,11 +215,9 @@
     let zoom = 100; // percent
     function zoomMap(change) {
       zoom += change;
-      if (zoom < 80) zoom = 80;
-      if (zoom > 150) zoom = 150;
-
-      const mapInner = document.getElementById('map-inner');
-      mapInner.style.transform = `scale(${zoom/100})`;
+      if (zoom < 50) zoom = 50;   // new min zoom
+      if (zoom > 150) zoom = 150; // max zoom
+      document.getElementById('map-inner').style.transform = `scale(${zoom/100})`;
     }
 
     // Layer toggling
