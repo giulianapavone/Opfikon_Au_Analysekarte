@@ -36,8 +36,8 @@
       position: absolute;
       top: 50%;
       left: 50%;
-      width: 1834px;
-      height: 2321px;
+      width: 1834px;  /* original PNG width */
+      height: 2321px; /* original PNG height */
       transform-origin: center center;
       transition: transform 0.05s linear;
     }
@@ -219,15 +219,23 @@
     let isDragging = false;
     let lastX, lastY;
 
+    // Calculate initial scale to fit width
+    function setInitialScale() {
+      const containerWidth = mapContainer.clientWidth;
+      scale = containerWidth / 1834; // 1834 = original PNG width
+      scale = Math.min(Math.max(0.5, scale), 2); // clamp between 0.5x and 2x
+      updateTransform();
+    }
+
     function updateTransform() {
       mapInner.style.transform = `translate(-50%, -50%) translate(${translateX}px, ${translateY}px) scale(${scale})`;
     }
 
     mapContainer.addEventListener('wheel', e => {
       e.preventDefault();
-      const zoomSpeed = 0.1;
-      scale += (e.deltaY < 0 ? zoomSpeed : -zoomSpeed);
-      scale = Math.min(Math.max(0.5, scale), 5); // clamp 0.5–5
+      const zoomSpeed = 0.05;
+      const newScale = scale + (e.deltaY < 0 ? zoomSpeed : -zoomSpeed);
+      scale = Math.min(Math.max(0.5, newScale), 2);
       updateTransform();
     });
 
@@ -259,7 +267,10 @@
       mapContainer.style.cursor = 'grab';
     });
 
-    updateTransform();
+    window.addEventListener('resize', setInitialScale);
+
+    // Initialize
+    setInitialScale();
   </script>
 
 </body>
