@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Opfikon Au, Analysekarte</title>
+<title>Opfikon Au, Analysekarte1</title>
 <style>
 * {
   margin: 0;
@@ -33,9 +33,10 @@ body {
 #map-container {
   position: relative;
   background: #fff;
+  min-height: 1000px; /* simuliert lange Karte zum Scrollen */
+  padding-bottom: 500px; /* mehr Abstand nach unten, Footer sitzt weiter weg */
 }
 
-/* Layer */
 .layer {
   position: absolute;
   top: 0;
@@ -124,7 +125,33 @@ body {
   margin-right: 5px;
 }
 
-<!-- Linke Spalte: Karte -->
+/* Unterer Bereich: NUR unter der Karte */
+#footer-info {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  padding: 20px 30px;
+  font-size: 13px;
+  color: #333;
+  border-top: 1px solid #ccc;
+  background: #f7f7f7;
+  flex-shrink: 0;
+}
+
+#footer-info .sources {
+  text-align: left;
+  max-width: 50%;
+}
+
+#footer-info .map-info {
+  text-align: right;
+  max-width: 50%;
+}
+</style>
+</head>
+<body>
+
+<!-- Linke Spalte: Karte + Footer -->
 <div id="main-column">
   <div id="map-container">
     <img src="Analysekarte-Basekarte.png" class="layer" id="Analysekarte-Basekarte">
@@ -138,6 +165,22 @@ body {
     <img src="Analysekarte-Unfälle.png" class="layer" id="Analysekarte-Unfälle">
     <img src="Analysekarte-Fussgängerstreifen.png" class="layer" id="Analysekarte-Fussgängerstreifen">
     <img src="Analysekarte-Busstationen.png" class="layer" id="Analysekarte-Busstationen">
+  </div>
+
+  <!-- Fußbereich NUR unter der Karte -->
+  <div id="footer-info">
+    <div class="sources">
+      <strong>Quellen:</strong><br>
+      Bundesamt für Statistik (BFS)<br>
+      OpenStreetMap (OSM)<br>
+      Stadt Opfikon, GIS-Daten 2024
+    </div>
+    <div class="map-info">
+      <strong>Karteninformationen:</strong><br>
+      Erstellungsdatum: 2024<br>
+      Massstab: 1:5'000<br>
+      Projektion: CH1903+ / LV95
+    </div>
   </div>
 </div>
 
@@ -238,6 +281,7 @@ function updateLegend() {
 }
 
 document.getElementById('Analysekarte-Basekarte').style.display = 'block';
+</script>
 
 </body>
 </html>
