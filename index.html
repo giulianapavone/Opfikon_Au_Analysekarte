@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Opfikon Au, Analysekarte1</title>
+<title>Opfikon Au, Analysekarte</title>
 <style>
   * {
     margin: 0;
@@ -53,7 +53,6 @@
     display: none;
   }
 
-  /* Layer order */
   #Analysekarte-Bauzonen { z-index: 0; }
   #Analysekarte-Strassenlärm { z-index: 1; }
   #Analysekarte-Glatt { z-index: 2; display: block; }
@@ -77,7 +76,6 @@
     position: relative;
   }
 
-  /* Zoom buttons */
   #zoom-controls {
     display: grid;
     grid-template-columns: repeat(5, 1fr);
@@ -101,11 +99,6 @@
     background-color: #bbb;
   }
 
-  /* Layer toggle buttons */
-  #buttons {
-    top: 0;
-  }
-
   #buttons button {
     display: block;
     width: 100%;
@@ -123,7 +116,6 @@
     color: white;
   }
 
-  /* Source tab at bottom of sidebar */
   #source-tab {
     position: fixed;
     bottom: 0;
@@ -137,7 +129,6 @@
     backdrop-filter: blur(2px);
   }
 
-  /* Legend */
   #legend-container {
     flex: 1;
     overflow-y: auto;
@@ -150,7 +141,7 @@
     top: 0;
     background: #fff;
     z-index: 10;
-    display: none;
+    display: block;
     font-weight: bold;
   }
 
@@ -185,7 +176,6 @@
 </head>
 <body>
 
-<!-- Left: map -->
 <div id="main-column">
   <div id="map-container">
     <div id="map-inner">
@@ -204,7 +194,6 @@
   </div>
 </div>
 
-<!-- Right: sidebar -->
 <div id="sidebar">
 
   <div id="zoom-controls">
@@ -233,7 +222,6 @@
   </div>
 </div>
 
-<!-- fixed Quelle tab at bottom -->
 <div id="source-tab">
   Quellen: GIS-Daten 2025, Geo Admin-Daten & Google Maps
 </div>
@@ -271,7 +259,7 @@ function toggleLayer(id, button) {
   updateLegend();
 }
 
-// Layer und Legendeninfos
+// Legend info
 const layerLegends = [
   {
     title: "Bauzonen",
@@ -321,7 +309,7 @@ const layerLegends = [
     ]
   },
   {
-    title:"Durchschnittlicher Strassenlärm in dB(A), 06:00-22:00",
+    title:"Strassenlärm",
     layers:[
       {id:"Analysekarte-Strassenlärm", items:[
         {label:">= 75 dB(A)", color:"#787fab"},
@@ -345,68 +333,47 @@ const layerLegends = [
   }
 ];
 
+// Always show legend icons, regardless of layer visibility
 function updateLegend() {
   const legendList = document.getElementById('legend-list');
-  const legendTitle = document.getElementById('legend-title');
   legendList.innerHTML = '';
 
   layerLegends.forEach(group => {
-    const activeLayers = group.layers.filter(layer =>
-      document.getElementById(layer.id).style.display === 'block'
-    );
+    const liGroup = document.createElement('li');
+    liGroup.innerHTML = `<strong>${group.title}</strong>`;
+    legendList.appendChild(liGroup);
 
-    if (activeLayers.length > 0) {
-      const liGroup = document.createElement('li');
-      liGroup.innerHTML = `<strong>${group.title}</strong>`;
-      legendList.appendChild(liGroup);
+    group.layers.forEach(layer => {
+      layer.items.forEach(item => {
+        const li = document.createElement('li');
+        const symbol = document.createElement('div');
+        symbol.className = 'symbol';
 
-      activeLayers.forEach(layer => {
-        layer.items.forEach(item => {
-          const li = document.createElement('li');
-          const symbol = document.createElement('div');
-          symbol.className = 'symbol';
+        if (item.icon) {
+          const img = document.createElement('img');
+          img.src = item.icon;
+          img.alt = item.label;
+          symbol.appendChild(img);
+        } else if (item.line) {
+          symbol.style.backgroundColor = item.color;
+          symbol.style.height = '4px';
+          symbol.style.width = '100%';
+        } else if (item.stripes) {
+          symbol.style.backgroundImage = `repeating-linear-gradient(to right, ${item.color} 0 2px, white 2px 4px)`;
+        } else if (item.color) {
+          symbol.style.backgroundColor = item.color;
+        }
 
-          if (item.icon) {
-            const img = document.createElement('img');
-            img.src = item.icon;
-            img.alt = item.label;
-            symbol.appendChild(img);
-          } else if (item.line) {
-            symbol.style.backgroundColor = item.color;
-            symbol.style.height = '4px';
-            symbol.style.width = '100%';
-          } else if (item.stripes) {
-            symbol.style.backgroundImage = `repeating-linear-gradient(to right, ${item.color} 0 2px, white 2px 4px)`;
-          } else if (item.color) {
-            symbol.style.backgroundColor = item.color;
-          }
-
-          li.appendChild(symbol);
-          li.appendChild(document.createTextNode(item.label));
-          legendList.appendChild(li);
-        });
+        li.appendChild(symbol);
+        li.appendChild(document.createTextNode(item.label));
+        legendList.appendChild(li);
       });
-    }
+    });
   });
-
-  legendTitle.style.display = legendList.children.length > 0 ? 'block' : 'none';
-  adjustLegendPadding();
 }
 
-function adjustLegendPadding() {
-  const source = document.getElementById('source-tab');
-  const legend = document.getElementById('legend-container');
-  legend.style.paddingBottom = source.offsetHeight + 'px';
-}
-
-// Initialization
-document.getElementById('Analysekarte-Basekarte').style.display='block';
-document.getElementById('Analysekarte-Glatt').style.display='block';
 updateZoomDisplay();
-adjustLegendPadding();
 updateLegend();
-
-window.addEventListener('resize', adjustLegendPadding);
 </script>
 
 </body>
