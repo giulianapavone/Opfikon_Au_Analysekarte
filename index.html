@@ -68,7 +68,7 @@
 
     /* Sidebar */
     #sidebar {
-      width: 200px;
+      width: 220px;
       display: flex;
       flex-direction: column;
       background: #fff;
@@ -87,9 +87,9 @@
     
     #zoom-controls button {
       width: 100%;
-      padding: 2px 4px; /* gleich wie layer buttons */
+      padding: 2px 4px;
       margin-bottom: 2px;
-      font-size: 11px; /* kleiner als layer buttons */
+      font-size: 11px;
       cursor: pointer;
       border: none;
       border-radius: 4px;
@@ -104,6 +104,7 @@
     /* Layer toggle buttons */
     #buttons {
       top: 0;
+      margin-top: 4px;
     }
 
     #buttons button {
@@ -128,12 +129,12 @@
       position: fixed;
       bottom: 0;
       right: 0;
-      width: 200px;
+      width: 220px;
       text-align: center;
       font-size: 11px;
       color: #777;
-      padding: 4px 4px 4px 4px;
-      background-color: rgba(255,255,255,0.5); /* halbtransparent */
+      padding: 4px;
+      background-color: rgba(255,255,255,0.5);
       backdrop-filter: blur(2px);
     }
 
@@ -141,10 +142,7 @@
     #legend-container {
       flex: 1;
       overflow-y: auto;
-    }
-
-    #legend-container h3 {
-      display: none; /* hidden by default */
+      margin-top: 4px;
     }
 
     #legend-title {
@@ -153,7 +151,9 @@
       top: 0;
       background: #fff;
       z-index: 10;
-      display: none; /* Standard: unsichtbar */
+      display: none;
+      font-weight: bold;
+      border-bottom: 1px solid #ccc;
     }
 
     #legend-list {
@@ -167,11 +167,16 @@
       font-size: 14px;
     }
 
-    #legend-list span {
+    #legend-list li span, #legend-list li img {
       display: inline-block;
       width: 20px;
       height: 20px;
       margin-right: 5px;
+    }
+
+    #legend-list li strong {
+      margin-bottom: 2px;
+      display: block;
     }
   </style>
 </head>
@@ -220,13 +225,10 @@
     </div>
 
     <div id="legend-container">
-    <h3 id="legend-title">Legende</h3>
-    <div id="legend-scroll">
+      <div id="legend-title">Legende</div>
       <ul id="legend-list"></ul>
     </div>
-</div>
 
-  
   </div>
 
   <!-- fixed Quelle tab at bottom -->
@@ -236,11 +238,11 @@
   
   <script>
     let zoom = 100;
-  
+
     function updateZoomDisplay() {
       document.getElementById('zoom-default').textContent = zoom + '%';
     }
-  
+
     function zoomMap(change) {
       zoom += change;
       if (zoom < 50) zoom = 50;
@@ -248,13 +250,13 @@
       document.getElementById('map-inner').style.transform = `scale(${zoom / 100})`;
       updateZoomDisplay();
     }
-  
+
     function zoomDefault() {
       zoom = 100;
       document.getElementById('map-inner').style.transform = `scale(1)`;
       updateZoomDisplay();
     }
-  
+
     function toggleLayer(id, button) {
       const el = document.getElementById(id);
       if (el.style.display === 'block') {
@@ -266,15 +268,17 @@
       }
       updateLegend();
     }
-  
+
     const layerLegends = {
       "Analysekarte-Bauzonen": [
+        { label: "Bauzone Typ", type: "title" },
         { label: "WG3", color: "#ffd4d0" },
         { label: "W4", color: "#ffded0" },
         { label: "W3", color: "#ffefd0" },
-        { label: "W2d", color: "#fff7d0" },
+        { label: "W2d", color: "#fff7d0" }
       ],
       "Analysekarte-Strassenlärm": [
+        { label: "Strassenlärm in dB(A)", type: "title" },
         { label: ">= 75 dB(A) 06:00-22:00", color: "#787fab" },
         { label: "70-74.9 dB(A) 06:00-22:00", color: "#bfadcc" },
         { label: "65-69.9 dB(A) 06:00-22:00", color: "#aa6974" },
@@ -285,89 +289,93 @@
         { label: "40-44.9 dB(A) 06:00-22:00", color: "#677b64" }
       ],
       "Analysekarte-Gebäudealter": [
-        { label: "Altbau", color: "#8B4513" },
+        { label: "Gebäudealter", type: "title" },
+        { label: "1926-1950", color: "#c3268a" },
         { label: "Mittelbau", color: "#CD853F" },
         { label: "Neubau", color: "#DEB887" }
       ],
       "Analysekarte-Fusswege": [
+        { label: "Fusswege Typ", type: "title" },
         { label: "Fussgängerzone", color: "#FFD700" },
         { label: "Platz", color: "#FFFF66" },
         { label: "Durchgang", color: "#FFE066" }
       ],
       "Analysekarte-Velowege": [
+        { label: "Velowege Typ", type: "title" },
         { label: "Veloweg", color: "#00BFFF" },
         { label: "Shared Bike", color: "#3399FF" },
         { label: "Fahrradstraße", color: "#66CCFF" }
       ],
       "Analysekarte-Fluglärm": [
-        { label: "Lärmzone hoch", color: "#C0C0C0" },
-        { label: "Lärmzone mittel", color: "#A0A0A0" },
-        { label: "Lärmzone niedrig", color: "#909090" }
+        { label: "Fluglärmzone", type: "title" },
+        { label: "hoch", color: "#C0C0C0" },
+        { label: "mittel", color: "#A0A0A0" },
+        { label: "niedrig", color: "#909090" }
       ],
       "Analysekarte-Unfälle": [
+        { label: "Unfälle", type: "title" },
         { label: "Unfallort", color: "#FF4500" },
         { label: "Unfallhäufig", color: "#FF6347" },
         { label: "Gefahrenstelle", color: "#FF7F50" }
       ],
       "Analysekarte-Fussgängerstreifen": [
+        { label: "Fussgängerstreifen", type: "title" },
         { label: "Zebrastreifen", color: "#FFFFFF" },
         { label: "Ampelkreuzung", color: "#EEEEEE" },
         { label: "Warnung", color: "#DDDDDD" }
       ],
       "Analysekarte-Busstationen": [
-        { label: "Bushaltestelle", color: "#32CD32" },
-        { label: "Buslinie", color: "#3CB371" },
-        { label: "Wartebereich", color: "#66CDAA" }
+        { label: "Busstationen", type: "title" },
+        { label: "Bushaltestelle", icon: "bus.png" },
+        { label: "Buslinie", icon: "busline.png" },
+        { label: "Wartebereich", icon: "waiting.png" }
       ]
     };
-  
+
     function updateLegend() {
       const legendList = document.getElementById('legend-list');
       const legendTitle = document.getElementById('legend-title');
       legendList.innerHTML = '';
-  
+
       Object.keys(layerLegends).forEach(layerId => {
         const el = document.getElementById(layerId);
         if (el.style.display === 'block') {
           layerLegends[layerId].forEach(item => {
             const li = document.createElement('li');
-            li.innerHTML = `<span style="background:${item.color};"></span>${item.label}`;
+
+            if (item.type === "title") {
+              li.innerHTML = `<strong>${item.label}</strong>`;
+            } else if (item.icon) {
+              li.innerHTML = `<img src="${item.icon}" alt="${item.label}">${item.label}`;
+            } else if (item.color) {
+              li.innerHTML = `<span style="background:${item.color};"></span>${item.label}`;
+            }
+
             legendList.appendChild(li);
           });
         }
       });
-  
+
       legendTitle.style.display = legendList.children.length > 0 ? 'block' : 'none';
-      adjustLegendPadding(); // neu: Padding nach unten anpassen
+      adjustLegendPadding();
     }
-  
-    // Funktion, um Padding unter Legendcontainer dynamisch an Höhe der Quelle anzupassen
+
     function adjustLegendPadding() {
       const source = document.getElementById('source-tab');
       const legend = document.getElementById('legend-container');
       const sourceHeight = source.offsetHeight;
       legend.style.paddingBottom = sourceHeight + 'px';
     }
-  
+
     // Initialisierung
     document.getElementById('Analysekarte-Basekarte').style.display = 'block';
     document.getElementById('Analysekarte-Glatt').style.display = 'block';
     updateZoomDisplay();
     adjustLegendPadding();
-  
-    // Resize Event, falls sich Höhe der Quelle dynamisch ändert
+    updateLegend();
+
     window.addEventListener('resize', adjustLegendPadding);
   </script>
 
 </body>
 </html>
-
-
-
-
-
-
-
-
-
-
