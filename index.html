@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Opfikon Au, Analysekarte</title>
+<title>Opfikon Au, Analysekarte1</title>
 <style>
   * {
     margin: 0;
@@ -159,33 +159,28 @@
   }
 
   #legend-list li {
-    margin: 2px 0;
     display: flex;
     align-items: center;
+    margin: 2px 0;
     font-size: 14px;
   }
 
- /* Einheitlicher Stil für alle Legendensymbole */
- #legend-list li span {
-   display: inline-block;
-   width: 20px;
-   height: 20px;
-   margin-right: 5px;
-   vertical-align: middle;
-   background-size: contain;
-   background-repeat: no-repeat;
-   background-position: center;
- }
+  #legend-list li .symbol {
+    width: 20px;
+    height: 20px;
+    margin-right: 5px;
+    flex-shrink: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
 
- #legend-list li img {
-  display: inline-block;
-  width: 20px;
-  height: 20px;
-  object-fit: contain;
-  margin-right: 5px;
-  vertical-align: middle;
-}
- 
+  #legend-list li .symbol img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+  }
+
 </style>
 </head>
 <body>
@@ -353,16 +348,14 @@ const layerLegends = [
 function updateLegend() {
   const legendList = document.getElementById('legend-list');
   const legendTitle = document.getElementById('legend-title');
-  legendList.innerHTML = ''; // clear old items
+  legendList.innerHTML = '';
 
   layerLegends.forEach(group => {
-    // Only include visible layers
     const activeLayers = group.layers.filter(layer =>
       document.getElementById(layer.id).style.display === 'block'
     );
 
     if (activeLayers.length > 0) {
-      // Group title
       const liGroup = document.createElement('li');
       liGroup.innerHTML = `<strong>${group.title}</strong>`;
       legendList.appendChild(liGroup);
@@ -370,41 +363,21 @@ function updateLegend() {
       activeLayers.forEach(layer => {
         layer.items.forEach(item => {
           const li = document.createElement('li');
+          const symbol = document.createElement('div');
+          symbol.className = 'symbol';
 
-          // Create a single 20x20 span for the symbol
-          const symbol = document.createElement('span');
-          symbol.style.width = '20px';
-          symbol.style.height = '20px';
-          symbol.style.display = 'inline-block';
-          symbol.style.marginRight = '5px';
-          symbol.style.verticalAlign = 'middle';
-          symbol.style.backgroundSize = 'contain';
-          symbol.style.backgroundRepeat = 'no-repeat';
-          symbol.style.backgroundPosition = 'center';
-          symbol.style.backgroundColor = ''; // reset any previous color
-
-          // Clear any previous children to avoid conflicts
-          while (symbol.firstChild) symbol.removeChild(symbol.firstChild);
-
-          // Determine symbol type
           if (item.icon) {
-            // PNG icon
-            symbol.style.backgroundImage = `url('${item.icon}')`;
+            const img = document.createElement('img');
+            img.src = item.icon;
+            img.alt = item.label;
+            symbol.appendChild(img);
           } else if (item.line) {
-            // Horizontal line
-            symbol.style.backgroundImage = `linear-gradient(to right, ${item.color} 100%, transparent 0)`;
-            symbol.style.backgroundSize = '100% 4px';
-            symbol.style.backgroundPosition = 'center';
-            symbol.style.backgroundRepeat = 'no-repeat';
+            symbol.style.backgroundColor = item.color;
+            symbol.style.height = '4px';
+            symbol.style.width = '100%';
           } else if (item.stripes) {
-            // Stripes (horizontal)
-            symbol.style.backgroundImage = `repeating-linear-gradient(
-              to right,
-              ${item.color} 0 2px,
-              white 2px 4px
-            )`;
+            symbol.style.backgroundImage = `repeating-linear-gradient(to right, ${item.color} 0 2px, white 2px 4px)`;
           } else if (item.color) {
-            // Solid color
             symbol.style.backgroundColor = item.color;
           }
 
@@ -416,10 +389,8 @@ function updateLegend() {
     }
   });
 
-  // Show legend title only if there are items
   legendTitle.style.display = legendList.children.length > 0 ? 'block' : 'none';
-
-  adjustLegendPadding(); // keep padding above source tab
+  adjustLegendPadding();
 }
 
 function adjustLegendPadding() {
@@ -428,7 +399,7 @@ function adjustLegendPadding() {
   legend.style.paddingBottom = source.offsetHeight + 'px';
 }
 
-// Initialisierung
+// Initialization
 document.getElementById('Analysekarte-Basekarte').style.display='block';
 document.getElementById('Analysekarte-Glatt').style.display='block';
 updateZoomDisplay();
@@ -440,9 +411,3 @@ window.addEventListener('resize', adjustLegendPadding);
 
 </body>
 </html>
-
-
-
-
-
-
