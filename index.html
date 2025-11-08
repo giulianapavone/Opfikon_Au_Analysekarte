@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Opfikon Au, Analysekarte1</title>
+<title>Opfikon Au, Analysekarte</title>
 <style>
   * {
     margin: 0;
@@ -353,10 +353,10 @@ const layerLegends = [
 function updateLegend() {
   const legendList = document.getElementById('legend-list');
   const legendTitle = document.getElementById('legend-title');
-  legendList.innerHTML = '';
+  legendList.innerHTML = ''; // clear old items
 
   layerLegends.forEach(group => {
-    // Only include layers that are currently visible
+    // Only include visible layers
     const activeLayers = group.layers.filter(layer =>
       document.getElementById(layer.id).style.display === 'block'
     );
@@ -381,11 +381,15 @@ function updateLegend() {
           symbol.style.backgroundSize = 'contain';
           symbol.style.backgroundRepeat = 'no-repeat';
           symbol.style.backgroundPosition = 'center';
+          symbol.style.backgroundColor = ''; // reset any previous color
 
-          // Determine what type of symbol to display
+          // Clear any previous children to avoid conflicts
+          while (symbol.firstChild) symbol.removeChild(symbol.firstChild);
+
+          // Determine symbol type
           if (item.icon) {
-            // Use PNG icon
-            symbol.style.backgroundImage = `url(${item.icon})`;
+            // PNG icon
+            symbol.style.backgroundImage = `url('${item.icon}')`;
           } else if (item.line) {
             // Horizontal line
             symbol.style.backgroundImage = `linear-gradient(to right, ${item.color} 100%, transparent 0)`;
@@ -393,9 +397,9 @@ function updateLegend() {
             symbol.style.backgroundPosition = 'center';
             symbol.style.backgroundRepeat = 'no-repeat';
           } else if (item.stripes) {
-            // Stripes pattern
+            // Stripes (horizontal)
             symbol.style.backgroundImage = `repeating-linear-gradient(
-              45deg,
+              to right,
               ${item.color} 0 2px,
               white 2px 4px
             )`;
@@ -414,7 +418,8 @@ function updateLegend() {
 
   // Show legend title only if there are items
   legendTitle.style.display = legendList.children.length > 0 ? 'block' : 'none';
-  adjustLegendPadding();
+
+  adjustLegendPadding(); // keep padding above source tab
 }
 
 function adjustLegendPadding() {
@@ -435,6 +440,7 @@ window.addEventListener('resize', adjustLegendPadding);
 
 </body>
 </html>
+
 
 
 
