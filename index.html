@@ -5,7 +5,11 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Opfikon Au, Analysekarte</title>
   <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; }
+    * { 
+      margin: 0; 
+      padding: 0; 
+      box-sizing: border-box; 
+    }
 
     body {
       display: flex;
@@ -98,7 +102,9 @@
     }
 
     /* Layer toggle buttons */
-    #buttons { top: 0; margin-top: 4px; }
+    #buttons { 
+      top: 0;
+    }
 
     #buttons button {
       display: block;
@@ -220,7 +226,7 @@
 
   <!-- fixed Quelle tab at bottom -->
   <div id="source-tab">
-    Quelle: Stadt Opfikon, GIS-Daten 2025
+    Quellen: GIS-Daten 2025, Geo Admin-Daten & Google Maps
   </div>
   
   <script>
@@ -261,24 +267,20 @@
         title: "Verkehr",
         layers: [
           { id: "Analysekarte-Fusswege", items: [
-              { label: "Fussgängerzone", color: "#FFD700" },
-              { label: "Platz", color: "#FFFF66" },
-              { label: "Durchgang", color: "#FFE066" }
+              { label: "Fussgänger zugängliche Wege", color: "#ee000b", line: true },
+              { label: "fehlende Fusswege", color: "#ee000b", stripe: "vertical" },
+          ]},
+          { id: "Analysekarte-Fussgängerstreifen", items: [
+              { label: "Fussgängerstreifen", icon: "Fussgängerstreifensymbol.png" },
           ]},
           { id: "Analysekarte-Velowege", items: [
-              { label: "Veloweg", color: "#00BFFF" },
-              { label: "Shared Bike", color: "#3399FF" },
-              { label: "Fahrradstraße", color: "#66CCFF" }
+              { label: "Veloweg", color: "#000aee", line: true },
           ]},
           { id: "Analysekarte-Busstationen", items: [
-              { label: "Bushaltestelle", icon: "bus.png" },
-              { label: "Buslinie", icon: "busline.png" },
-              { label: "Wartebereich", icon: "waiting.png" }
+              { label: "Bushaltestellen", icon: "bushaltestellensymbol.png" },
           ]},
           { id: "Analysekarte-Unfälle", items: [
-              { label: "Unfallort", color: "#FF4500" },
-              { label: "Unfallhäufig", color: "#FF6347" },
-              { label: "Gefahrenstelle", color: "#FF7F50" }
+              { label: "Unfälle seit 2011 bos Anfangs 2025", icon: "unfällesymbol.png" },
           ]}
         ]
       },
@@ -294,7 +296,7 @@
         ]
       },
       {
-        title: "Gebäudealter",
+        title: "Baujahr",
         layers: [
           { id: "Analysekarte-Gebäudealter", items: [
               { label: "1926-1950", color: "#c3268a" },
@@ -309,7 +311,7 @@
         ]
       },
       {
-        title: "Lärm",
+        title: "Durchschnittlicher Strassenlärm in dB(A), 06:00-22:00",
         layers: [
           { id: "Analysekarte-Strassenlärm", items: [
               { label: ">= 75 dB(A)", color: "#787fab" },
@@ -320,11 +322,13 @@
               { label: "50-54.9 dB(A)", color: "#f9cc85" },
               { label: "45-49.9 dB(A)", color: "#eee86e" },
               { label: "40-44.9 dB(A)", color: "#677b64" }
-          ]},
-          { id: "Analysekarte-Fluglärm", items: [
-              { label: "hoch", color: "#C0C0C0" },
-              { label: "mittel", color: "#A0A0A0" },
-              { label: "niedrig", color: "#909090" }
+          ]}
+        ]
+      },
+      {
+        title: "Fluglärmlinie in dB(A)",
+        layers: [
+              { label: "65 dB(A)", color: "#007d1d, line: true" }
           ]}
         ]
       }
@@ -381,3 +385,4 @@
 
 </body>
 </html>
+
