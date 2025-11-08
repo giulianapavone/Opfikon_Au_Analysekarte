@@ -5,11 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Opfikon Au, Analysekarte</title>
   <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
 
     body {
       display: flex;
@@ -102,10 +98,7 @@
     }
 
     /* Layer toggle buttons */
-    #buttons {
-      top: 0;
-      margin-top: 4px;
-    }
+    #buttons { top: 0; margin-top: 4px; }
 
     #buttons button {
       display: block;
@@ -155,9 +148,7 @@
       font-weight: bold;
     }
 
-    #legend-list {
-      list-style: none;
-    }
+    #legend-list { list-style: none; }
 
     #legend-list li {
       margin: 2px;
@@ -173,10 +164,7 @@
       margin-right: 5px;
     }
 
-    #legend-list li strong {
-      margin-bottom: 2px;
-      display: block;
-    }
+    #legend-list li strong { margin-bottom: 2px; display: block; }
   </style>
 </head>
 <body>
@@ -268,94 +256,104 @@
       updateLegend();
     }
 
-    const layerLegends = {
-      "Analysekarte-Bauzonen": [
-        { label: "Bauzonen", type: "title" },
-        { label: "WG3", color: "#ffd4d0" },
-        { label: "W4", color: "#ffded0" },
-        { label: "W3", color: "#ffefd0" },
-        { label: "W2d", color: "#fff7d0" }
-      ],
-      "Analysekarte-Gebäudealter": [
-        { label: "Baujahre", type: "title" },
-        { label: "1926-1950", color: "#c3268a" },
-        { label: "1951-1960", color: "#ec5689" },
-        { label: "1961-1970", color: "#f4737e" },
-        { label: "1971-1980", color: "#f5926e" },
-        { label: "1981-1990", color: "#edb066" },
-        { label: "1991-2000", color: "#e0cb6e" },
-        { label: "2001-2010", color: "#c8e17c" },
-        { label: "2011-heute", color: "#88e17c" }
-      ],
-      "Analysekarte-Strassenlärm": [
-        { label: "durchschnittlicher Strassenlärm in dB(A) von 06:00 bis 22:00", type: "title" },
-        { label: ">= 75 dB(A)", color: "#787fab" },
-        { label: "70-74.9 dB(A)", color: "#bfadcc" },
-        { label: "65-69.9 dB(A)", color: "#aa6974" },
-        { label: "60-64.9 dB(A)", color: "#eb7878" },
-        { label: "55-59.9 dB(A)", color: "#ee966e" },
-        { label: "50-54.9 dB(A)", color: "#f9cc85" },
-        { label: "45-49.9 dB(A)", color: "#eee86e" },
-        { label: "40-44.9 dB(A)", color: "#677b64" }
-      ],
-      "Analysekarte-Fusswege": [
-        { label: "Fusswege Typ", type: "title" },
-        { label: "Fussgängerzone", color: "#FFD700" },
-        { label: "Platz", color: "#FFFF66" },
-        { label: "Durchgang", color: "#FFE066" }
-      ],
-      "Analysekarte-Velowege": [
-        { label: "Velowege Typ", type: "title" },
-        { label: "Veloweg", color: "#00BFFF" },
-        { label: "Shared Bike", color: "#3399FF" },
-        { label: "Fahrradstraße", color: "#66CCFF" }
-      ],
-      "Analysekarte-Fluglärm": [
-        { label: "Fluglärmzone", type: "title" },
-        { label: "hoch", color: "#C0C0C0" },
-        { label: "mittel", color: "#A0A0A0" },
-        { label: "niedrig", color: "#909090" }
-      ],
-      "Analysekarte-Unfälle": [
-        { label: "Unfälle", type: "title" },
-        { label: "Unfallort", color: "#FF4500" },
-        { label: "Unfallhäufig", color: "#FF6347" },
-        { label: "Gefahrenstelle", color: "#FF7F50" }
-      ],
-      "Analysekarte-Fussgängerstreifen": [
-        { label: "Fussgängerstreifen", type: "title" },
-        { label: "Zebrastreifen", color: "#FFFFFF" },
-        { label: "Ampelkreuzung", color: "#EEEEEE" },
-        { label: "Warnung", color: "#DDDDDD" }
-      ],
-      "Analysekarte-Busstationen": [
-        { label: "Busstationen", type: "title" },
-        { label: "Bushaltestelle", icon: "bus.png" },
-        { label: "Buslinie", icon: "busline.png" },
-        { label: "Wartebereich", icon: "waiting.png" }
-      ]
-    };
+    const layerLegends = [
+      {
+        title: "Verkehr",
+        layers: [
+          { id: "Analysekarte-Fusswege", items: [
+              { label: "Fussgängerzone", color: "#FFD700" },
+              { label: "Platz", color: "#FFFF66" },
+              { label: "Durchgang", color: "#FFE066" }
+          ]},
+          { id: "Analysekarte-Velowege", items: [
+              { label: "Veloweg", color: "#00BFFF" },
+              { label: "Shared Bike", color: "#3399FF" },
+              { label: "Fahrradstraße", color: "#66CCFF" }
+          ]},
+          { id: "Analysekarte-Busstationen", items: [
+              { label: "Bushaltestelle", icon: "bus.png" },
+              { label: "Buslinie", icon: "busline.png" },
+              { label: "Wartebereich", icon: "waiting.png" }
+          ]},
+          { id: "Analysekarte-Unfälle", items: [
+              { label: "Unfallort", color: "#FF4500" },
+              { label: "Unfallhäufig", color: "#FF6347" },
+              { label: "Gefahrenstelle", color: "#FF7F50" }
+          ]}
+        ]
+      },
+      {
+        title: "Bauzonen",
+        layers: [
+          { id: "Analysekarte-Bauzonen", items: [
+              { label: "WG3", color: "#ffd4d0" },
+              { label: "W4", color: "#ffded0" },
+              { label: "W3", color: "#ffefd0" },
+              { label: "W2d", color: "#fff7d0" }
+          ]}
+        ]
+      },
+      {
+        title: "Gebäudealter",
+        layers: [
+          { id: "Analysekarte-Gebäudealter", items: [
+              { label: "1926-1950", color: "#c3268a" },
+              { label: "1951-1960", color: "#ec5689" },
+              { label: "1961-1970", color: "#f4737e" },
+              { label: "1971-1980", color: "#f5926e" },
+              { label: "1981-1990", color: "#edb066" },
+              { label: "1991-2000", color: "#e0cb6e" },
+              { label: "2001-2010", color: "#c8e17c" },
+              { label: "2011-heute", color: "#88e17c" }
+          ]}
+        ]
+      },
+      {
+        title: "Lärm",
+        layers: [
+          { id: "Analysekarte-Strassenlärm", items: [
+              { label: ">= 75 dB(A)", color: "#787fab" },
+              { label: "70-74.9 dB(A)", color: "#bfadcc" },
+              { label: "65-69.9 dB(A)", color: "#aa6974" },
+              { label: "60-64.9 dB(A)", color: "#eb7878" },
+              { label: "55-59.9 dB(A)", color: "#ee966e" },
+              { label: "50-54.9 dB(A)", color: "#f9cc85" },
+              { label: "45-49.9 dB(A)", color: "#eee86e" },
+              { label: "40-44.9 dB(A)", color: "#677b64" }
+          ]},
+          { id: "Analysekarte-Fluglärm", items: [
+              { label: "hoch", color: "#C0C0C0" },
+              { label: "mittel", color: "#A0A0A0" },
+              { label: "niedrig", color: "#909090" }
+          ]}
+        ]
+      }
+    ];
 
     function updateLegend() {
       const legendList = document.getElementById('legend-list');
       const legendTitle = document.getElementById('legend-title');
       legendList.innerHTML = '';
 
-      Object.keys(layerLegends).forEach(layerId => {
-        const el = document.getElementById(layerId);
-        if (el.style.display === 'block') {
-          layerLegends[layerId].forEach(item => {
-            const li = document.createElement('li');
+      layerLegends.forEach(group => {
+        const activeLayers = group.layers.filter(layer =>
+          document.getElementById(layer.id).style.display === 'block'
+        );
+        if (activeLayers.length > 0) {
+          const liGroup = document.createElement('li');
+          liGroup.innerHTML = `<strong>${group.title}</strong>`;
+          legendList.appendChild(liGroup);
 
-            if (item.type === "title") {
-              li.innerHTML = `<strong>${item.label}</strong>`;
-            } else if (item.icon) {
-              li.innerHTML = `<img src="${item.icon}" alt="${item.label}">${item.label}`;
-            } else if (item.color) {
-              li.innerHTML = `<span style="background:${item.color};"></span>${item.label}`;
-            }
-
-            legendList.appendChild(li);
+          activeLayers.forEach(layer => {
+            layer.items.forEach(item => {
+              const li = document.createElement('li');
+              if (item.icon) {
+                li.innerHTML = `<img src="${item.icon}" alt="${item.label}">${item.label}`;
+              } else if (item.color) {
+                li.innerHTML = `<span style="background:${item.color};"></span>${item.label}`;
+              }
+              legendList.appendChild(li);
+            });
           });
         }
       });
