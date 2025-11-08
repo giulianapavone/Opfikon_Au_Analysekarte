@@ -74,6 +74,7 @@
       background: #fff;
       padding: 4px;
       border-left: 1px solid #ddd;
+      position: relative;
     }
 
     /* Zoom buttons */
@@ -122,14 +123,18 @@
       color: white;
     }
 
-    /* Source tab */
+    /* Source tab at bottom of sidebar */
     #source-tab {
+      position: fixed;
+      bottom: 0;
+      right: 0;
+      width: 200px;
       text-align: center;
       font-size: 11px;
       color: #777;
       border-top: 1px solid #ddd;
-      margin-top: 6px;
-      padding-top: 2px;
+      padding: 3px 0;
+      background: #fff;
     }
 
     /* Legend */
@@ -193,7 +198,7 @@
 
     <div id="zoom-controls">
       <button onclick="zoomMap(-5)">-</button>
-      <button onclick="zoomDefault()">100%</button>
+      <button id="zoom-default" onclick="zoomDefault()">100%</button>
       <button onclick="zoomMap(5)">+</button>
     </div>
 
@@ -209,30 +214,37 @@
       <button onclick="toggleLayer('Analysekarte-Unfälle', this)">Unfälle</button>
     </div>
 
-    <!-- new source tab -->
-    <div id="source-tab">
-      Quelle: Stadt Opfikon, GIS-Daten 2025
-    </div>
-
     <div id="legend-container">
       <h3 id="legend-title">Legende</h3>
       <ul id="legend-list"></ul>
     </div>
+
+  </div>
+
+  <!-- fixed Quelle tab at bottom -->
+  <div id="source-tab">
+    Quelle: Stadt Opfikon, GIS-Daten 2025
   </div>
 
   <script>
     let zoom = 100;
+
+    function updateZoomDisplay() {
+      document.getElementById('zoom-default').textContent = zoom + '%';
+    }
 
     function zoomMap(change) {
       zoom += change;
       if (zoom < 50) zoom = 50;
       if (zoom > 200) zoom = 200;
       document.getElementById('map-inner').style.transform = `scale(${zoom / 100})`;
+      updateZoomDisplay();
     }
 
     function zoomDefault() {
       zoom = 100;
       document.getElementById('map-inner').style.transform = `scale(1)`;
+      updateZoomDisplay();
     }
 
     function toggleLayer(id, button) {
@@ -311,13 +323,13 @@
         }
       });
 
-      // Show/hide title based on legend content
       legendTitle.style.display = legendList.children.length > 0 ? 'block' : 'none';
     }
 
-    // Show base layers initially
+    // Initialize
     document.getElementById('Analysekarte-Basekarte').style.display = 'block';
     document.getElementById('Analysekarte-Glatt').style.display = 'block';
+    updateZoomDisplay();
   </script>
 
 </body>
