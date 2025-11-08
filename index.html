@@ -153,7 +153,6 @@
       z-index: 10;
       display: none;
       font-weight: bold;
-      border-bottom: 1px solid #ccc;
     }
 
     #legend-list {
@@ -271,28 +270,33 @@
 
     const layerLegends = {
       "Analysekarte-Bauzonen": [
-        { label: "Bauzone Typ", type: "title" },
+        { label: "Bauzonen", type: "title" },
         { label: "WG3", color: "#ffd4d0" },
         { label: "W4", color: "#ffded0" },
         { label: "W3", color: "#ffefd0" },
         { label: "W2d", color: "#fff7d0" }
       ],
-      "Analysekarte-Strassenlärm": [
-        { label: "Strassenlärm in dB(A)", type: "title" },
-        { label: ">= 75 dB(A) 06:00-22:00", color: "#787fab" },
-        { label: "70-74.9 dB(A) 06:00-22:00", color: "#bfadcc" },
-        { label: "65-69.9 dB(A) 06:00-22:00", color: "#aa6974" },
-        { label: "60-64.9 dB(A) 06:00-22:00", color: "#eb7878" },
-        { label: "55-59.9 dB(A) 06:00-22:00", color: "#ee966e" },
-        { label: "50-54.9 dB(A) 06:00-22:00", color: "#f9cc85" },
-        { label: "45-49.9 dB(A) 06:00-22:00", color: "#eee86e" },
-        { label: "40-44.9 dB(A) 06:00-22:00", color: "#677b64" }
-      ],
       "Analysekarte-Gebäudealter": [
-        { label: "Gebäudealter", type: "title" },
+        { label: "Baujahre", type: "title" },
         { label: "1926-1950", color: "#c3268a" },
-        { label: "Mittelbau", color: "#CD853F" },
-        { label: "Neubau", color: "#DEB887" }
+        { label: "1951-1960", color: "#ec5689" },
+        { label: "1961-1970", color: "#f4737e" },
+        { label: "1971-1980", color: "#f5926e" },
+        { label: "1981-1990", color: "#edb066" },
+        { label: "1991-2000", color: "#e0cb6e" },
+        { label: "2001-2010", color: "#c8e17c" },
+        { label: "2011-heute", color: "#88e17c" }
+      ],
+      "Analysekarte-Strassenlärm": [
+        { label: "durchschnittlicher Strassenlärm in dB(A) von 06:00 bis 22:00", type: "title" },
+        { label: ">= 75 dB(A)", color: "#787fab" },
+        { label: "70-74.9 dB(A)", color: "#bfadcc" },
+        { label: "65-69.9 dB(A)", color: "#aa6974" },
+        { label: "60-64.9 dB(A)", color: "#eb7878" },
+        { label: "55-59.9 dB(A)", color: "#ee966e" },
+        { label: "50-54.9 dB(A)", color: "#f9cc85" },
+        { label: "45-49.9 dB(A)", color: "#eee86e" },
+        { label: "40-44.9 dB(A)", color: "#677b64" }
       ],
       "Analysekarte-Fusswege": [
         { label: "Fusswege Typ", type: "title" },
