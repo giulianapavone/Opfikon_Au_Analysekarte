@@ -165,39 +165,18 @@
     font-size: 14px;
   }
 
-  #legend-list li span {
-    display: inline-block;
-    width: 20px;
-    height: 20px;
-    margin-right: 5px;
-  }
-
-  #legend-list li img {
-    max-width: 20px;
-    max-height: 20px;
-    margin-right: 5px;
-  }
-
-  #legend-list li strong {
-    margin-bottom: 2px;
-    display: block;
-  }
-
-  .legend-line {
-    width: 20px;
-    height: 4px;
-    background: black;
-  }
-
-  .legend-stripes {
-    width: 20px;
-    height: 20px;
-    background-image: repeating-linear-gradient(
-      to right,
-      black 0 2px,
-      transparent 2px 4px
-    );
-  }
+ /* Einheitlicher Stil für alle Legendensymbole */
+ #legend-list li span {
+   display: inline-block;
+   width: 20px;
+   height: 20px;
+   margin-right: 5px;
+   vertical-align: middle;
+   background-size: contain;
+   background-repeat: no-repeat;
+   background-position: center;
+ }
+ 
 </style>
 </head>
 <body>
@@ -368,11 +347,11 @@ function updateLegend() {
   legendList.innerHTML = '';
 
   layerLegends.forEach(group => {
-    const activeLayers = group.layers.filter(layer => 
+    const activeLayers = group.layers.filter(layer =>
       document.getElementById(layer.id).style.display === 'block'
     );
 
-    if(activeLayers.length > 0) {
+    if (activeLayers.length > 0) {
       const liGroup = document.createElement('li');
       liGroup.innerHTML = `<strong>${group.title}</strong>`;
       legendList.appendChild(liGroup);
@@ -381,31 +360,39 @@ function updateLegend() {
         layer.items.forEach(item => {
           const li = document.createElement('li');
 
-          if(item.icon) {
-            const img = document.createElement('img');
-            img.src = item.icon;
-            img.alt = item.label;
-            li.appendChild(img);
-            li.appendChild(document.createTextNode(item.label));
-          } else if(item.line) {
-            const span = document.createElement('span');
-            span.className = 'legend-line';
-            span.style.backgroundColor = item.color || 'black';
-            li.appendChild(span);
-            li.appendChild(document.createTextNode(item.label));
-          } else if(item.stripes) {
-            const span = document.createElement('span');
-            span.className = 'legend-stripes';
-            span.style.backgroundColor = item.color || 'black';
-            li.appendChild(span);
-            li.appendChild(document.createTextNode(item.label));
-          } else if(item.color) {
-            const span = document.createElement('span');
-            span.style.backgroundColor = item.color;
-            li.appendChild(span);
-            li.appendChild(document.createTextNode(item.label));
+          // Einheitliches Quadrat
+          const symbol = document.createElement('span');
+
+          if (item.icon) {
+            // Icon-Hintergrund
+            symbol.style.backgroundImage = `url(${item.icon})`;
+          } else if (item.line) {
+            // Linie als dünner Streifen in der Mitte
+            symbol.style.background = 'transparent';
+            symbol.style.position = 'relative';
+            const line = document.createElement('div');
+            line.style.position = 'absolute';
+            line.style.top = '50%';
+            line.style.left = '0';
+            line.style.width = '100%';
+            line.style.height = '4px';
+            line.style.backgroundColor = item.color || 'black';
+            line.style.transform = 'translateY(-50%)';
+            symbol.appendChild(line);
+          } else if (item.stripes) {
+            // Streifenmuster (z. B. rot/weiß)
+            symbol.style.backgroundImage = `repeating-linear-gradient(
+              45deg,
+              ${item.color || 'black'} 0 2px,
+              white 2px 4px
+            )`;
+          } else if (item.color) {
+            // Einfache Farbfläche
+            symbol.style.backgroundColor = item.color;
           }
 
+          li.appendChild(symbol);
+          li.appendChild(document.createTextNode(item.label));
           legendList.appendChild(li);
         });
       });
@@ -434,3 +421,4 @@ window.addEventListener('resize', adjustLegendPadding);
 
 </body>
 </html>
+
