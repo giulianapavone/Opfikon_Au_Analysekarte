@@ -145,7 +145,6 @@
   }
 
   #legend-title {
-    padding: 4px;
     position: sticky;
     top: 0;
     background: #fff;
@@ -222,14 +221,14 @@
 
   <div id="buttons">
     <button onclick="toggleLayer('Analysekarte-Bauzonen', this)">Bauzonen</button>
-    <button onclick="toggleLayer('Analysekarte-Gebaeudealter', this)">Gebaeudealter</button>
+    <button onclick="toggleLayer('Analysekarte-Gebaeudealter', this)">Gebäudealter</button>
     <button onclick="toggleLayer('Analysekarte-Fusswege', this)">Fusswege</button>
-    <button onclick="toggleLayer('Analysekarte-Fussgaengerstreifen', this)">Fussgaengerstreifen</button>
+    <button onclick="toggleLayer('Analysekarte-Fussgaengerstreifen', this)">Fussgängerstreifen</button>
     <button onclick="toggleLayer('Analysekarte-Velowege', this)">Velowege</button>
     <button onclick="toggleLayer('Analysekarte-Busstationen', this)">Busstationen</button>
-    <button onclick="toggleLayer('Analysekarte-Unfaelle', this)">Unfaelle</button>
-    <button onclick="toggleLayer('Analysekarte-Strassenlaerm', this)">Strassenlaerm</button>
-    <button onclick="toggleLayer('Analysekarte-Fluglaerm', this)">Fluglaerm</button>
+    <button onclick="toggleLayer('Analysekarte-Unfaelle', this)">Unfälle</button>
+    <button onclick="toggleLayer('Analysekarte-Strassenlaerm', this)">Strassenlärm</button>
+    <button onclick="toggleLayer('Analysekarte-Fluglaerm', this)">Fluglärm</button>
   </div>
 
   <div id="legend-container">
@@ -326,7 +325,7 @@ const layerLegends = [
     ]
   },
   {
-    title:"Durchschnittlicher Strassenlaerm in dB(A), 06:00-22:00",
+    title:"Durchschnittlicher Strassenlärm von 06:00 bis 22:00",
     layers:[
       {id:"Analysekarte-Strassenlaerm", items:[
         {label:">= 75 dB(A)", color:"#787fab"},
