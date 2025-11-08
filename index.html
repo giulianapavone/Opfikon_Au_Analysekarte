@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Opfikon Au, Analysekarte1</title>
+  <title>Opfikon Au, Analysekarte</title>
   <style>
     * {
       margin: 0;
@@ -20,6 +20,7 @@
       overflow: hidden;
     }
 
+    /* Left: map */
     #main-column {
       display: flex;
       flex-direction: column;
@@ -71,6 +72,8 @@
       width: 200px;
       display: flex;
       flex-direction: column;
+      height: 100vh;        /* volle Höhe */
+      overflow: hidden;     /* nur Legendcontainer scrollt */
       background: #fff;
       padding: 4px;
       border-left: 1px solid #ddd;
@@ -84,28 +87,28 @@
       gap: 4px;
       width: 100%;
       margin-bottom: 4px;
+      flex-shrink: 0;       /* bleibt oben */
     }
-    
+
     #zoom-controls button {
       width: 100%;
-      padding: 2px 4px; /* gleich wie layer buttons */
-      font-size: 11px; /* kleiner als layer buttons */
+      padding: 2px 4px;
+      font-size: 11px;
       cursor: pointer;
       border: none;
       border-radius: 4px;
       background-color: #ccc;
       transition: background-color 0.2s;
     }
-    
+
     #zoom-controls button:hover {
       background-color: #bbb;
     }
 
     /* Layer toggle buttons */
     #buttons {
-      position: sticky;
-      top: 0;
       margin-bottom: 4px;
+      flex-shrink: 0;       /* bleibt oben */
     }
 
     #buttons button {
@@ -125,42 +128,22 @@
       color: white;
     }
 
-    /* Source tab at bottom of sidebar */
-    #source-tab {
-      position: fixed;
-      bottom: 0;
-      right: 0;
-      width: 200px;
-      text-align: center;
-      font-size: 11px;
-      color: #777;
-      padding: 20px 0 4px 0;
-      background: linear-gradient(to top, rgba(255,255,255,1) 20%, rgba(255,255,255,0) 100%);
-      /* backdrop-filter: blur(2px); */
-    }
-
-    /* Legend */
+    /* Legend container scrollt */
     #legend-container {
-      flex: 1;
-      overflow-y: auto;
-      margin: 0;
+      flex: 1;               /* nimmt Resthöhe ein */
+      overflow-y: auto;      /* nur Legende scrollt */
       padding-top: 2px;
-    }
-
-    #legend-container h3 {
-      margin: 0 0 2px 0;
-      padding: 0;
-      display: none; /* hidden by default */
+      padding-bottom: 8px;
     }
 
     #legend-title {
-      /* margin: 0 0 2px 0; */
       padding: 4px 0 2px 0;
       position: sticky;
       top: 0;
       background: #fff;
       z-index: 10;
-      display: none; /* Standard: unsichtbar */
+      display: none; /* wird per JS angezeigt */
+      border-bottom: 1px solid #ddd;
     }
 
     #legend-list {
@@ -181,6 +164,19 @@
       width: 20px;
       height: 20px;
       margin-right: 5px;
+    }
+
+    /* fixed Quelle tab at bottom */
+    #source-tab {
+      position: fixed;
+      bottom: 0;
+      right: 0;
+      width: 200px;
+      text-align: center;
+      font-size: 11px;
+      color: #777;
+      padding: 20px 0 4px 0;
+      background: linear-gradient(to top, rgba(255,255,255,1) 20%, rgba(255,255,255,0) 100%);
     }
   </style>
 </head>
@@ -235,18 +231,17 @@
   
   </div>
 
-  <!-- fixed Quelle tab at bottom -->
   <div id="source-tab">
     Quelle: Stadt Opfikon, GIS-Daten 2025
   </div>
-  
+
   <script>
     let zoom = 100;
-  
+
     function updateZoomDisplay() {
       document.getElementById('zoom-default').textContent = zoom + '%';
     }
-  
+
     function zoomMap(change) {
       zoom += change;
       if (zoom < 50) zoom = 50;
@@ -254,13 +249,13 @@
       document.getElementById('map-inner').style.transform = `scale(${zoom / 100})`;
       updateZoomDisplay();
     }
-  
+
     function zoomDefault() {
       zoom = 100;
       document.getElementById('map-inner').style.transform = `scale(1)`;
       updateZoomDisplay();
     }
-  
+
     function toggleLayer(id, button) {
       const el = document.getElementById(id);
       if (el.style.display === 'block') {
@@ -272,7 +267,7 @@
       }
       updateLegend();
     }
-  
+
     const layerLegends = {
       "Analysekarte-Bauzonen": [
         { label: "Wohngebiet", color: "#FFAAAA" },
@@ -320,12 +315,12 @@
         { label: "Wartebereich", color: "#66CDAA" }
       ]
     };
-  
+
     function updateLegend() {
       const legendList = document.getElementById('legend-list');
       const legendTitle = document.getElementById('legend-title');
       legendList.innerHTML = '';
-  
+
       Object.keys(layerLegends).forEach(layerId => {
         const el = document.getElementById(layerId);
         if (el.style.display === 'block') {
@@ -336,31 +331,25 @@
           });
         }
       });
-  
+
       legendTitle.style.display = legendList.children.length > 0 ? 'block' : 'none';
-      adjustLegendPadding(); // neu: Padding nach unten anpassen
+      adjustLegendPadding();
     }
-  
-    // Funktion, um Padding unter Legendcontainer dynamisch an Höhe der Quelle anzupassen
+
     function adjustLegendPadding() {
       const source = document.getElementById('source-tab');
       const legend = document.getElementById('legend-container');
       const sourceHeight = source.offsetHeight;
       legend.style.paddingBottom = sourceHeight + 'px';
     }
-  
+
     // Initialisierung
     document.getElementById('Analysekarte-Basekarte').style.display = 'block';
     document.getElementById('Analysekarte-Glatt').style.display = 'block';
     updateZoomDisplay();
     adjustLegendPadding();
-  
-    // Resize Event, falls sich Höhe der Quelle dynamisch ändert
+
     window.addEventListener('resize', adjustLegendPadding);
   </script>
-
 </body>
 </html>
-
-
-
