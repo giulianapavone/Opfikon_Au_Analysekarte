@@ -78,7 +78,6 @@
     }
 
     /* Zoom buttons */
-
     #zoom-controls {
       display: grid;
       grid-template-columns: repeat(5, 1fr);
@@ -86,7 +85,7 @@
       width: 100%;
       margin-bottom: 4px;
     }
-
+    
     #zoom-controls button {
       width: 100%;
       padding: 2px 4px; /* gleich wie layer buttons */
@@ -139,7 +138,6 @@
       background: linear-gradient(to top, rgba(255,255,255,1) 20%, rgba(255,255,255,0) 100%);
       /* backdrop-filter: blur(2px); */
     }
-
 
     /* Legend */
     #legend-container {
@@ -231,14 +229,14 @@
   <div id="source-tab">
     Quelle: Stadt Opfikon, GIS-Daten 2025
   </div>
-
+  
   <script>
     let zoom = 100;
-
+  
     function updateZoomDisplay() {
       document.getElementById('zoom-default').textContent = zoom + '%';
     }
-
+  
     function zoomMap(change) {
       zoom += change;
       if (zoom < 50) zoom = 50;
@@ -246,13 +244,13 @@
       document.getElementById('map-inner').style.transform = `scale(${zoom / 100})`;
       updateZoomDisplay();
     }
-
+  
     function zoomDefault() {
       zoom = 100;
       document.getElementById('map-inner').style.transform = `scale(1)`;
       updateZoomDisplay();
     }
-
+  
     function toggleLayer(id, button) {
       const el = document.getElementById(id);
       if (el.style.display === 'block') {
@@ -264,7 +262,7 @@
       }
       updateLegend();
     }
-
+  
     const layerLegends = {
       "Analysekarte-Bauzonen": [
         { label: "Wohngebiet", color: "#FFAAAA" },
@@ -312,12 +310,12 @@
         { label: "Wartebereich", color: "#66CDAA" }
       ]
     };
-
+  
     function updateLegend() {
       const legendList = document.getElementById('legend-list');
       const legendTitle = document.getElementById('legend-title');
       legendList.innerHTML = '';
-
+  
       Object.keys(layerLegends).forEach(layerId => {
         const el = document.getElementById(layerId);
         if (el.style.display === 'block') {
@@ -328,22 +326,28 @@
           });
         }
       });
-
+  
       legendTitle.style.display = legendList.children.length > 0 ? 'block' : 'none';
+      adjustLegendPadding(); // neu: Padding nach unten anpassen
     }
-
-    // Initialize
+  
+    // Funktion, um Padding unter Legendcontainer dynamisch an Höhe der Quelle anzupassen
+    function adjustLegendPadding() {
+      const source = document.getElementById('source-tab');
+      const legend = document.getElementById('legend-container');
+      const sourceHeight = source.offsetHeight;
+      legend.style.paddingBottom = sourceHeight + 'px';
+    }
+  
+    // Initialisierung
     document.getElementById('Analysekarte-Basekarte').style.display = 'block';
     document.getElementById('Analysekarte-Glatt').style.display = 'block';
     updateZoomDisplay();
+    adjustLegendPadding();
+  
+    // Resize Event, falls sich Höhe der Quelle dynamisch ändert
+    window.addEventListener('resize', adjustLegendPadding);
   </script>
 
 </body>
 </html>
-
-
-
-
-
-
-
