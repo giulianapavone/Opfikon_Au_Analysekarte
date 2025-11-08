@@ -368,8 +368,6 @@ function updateLegend() {
       activeLayers.forEach(layer => {
         layer.items.forEach(item => {
           const li = document.createElement('li');
-
-          // Einheitliches Quadrat
           const symbol = document.createElement('span');
 
           if (item.icon) {
@@ -381,11 +379,7 @@ function updateLegend() {
             img.style.objectFit = 'contain';
             img.style.marginRight = '5px';
             li.appendChild(img);
-            li.appendChild(document.createTextNode(item.label));
-            legendList.appendChild(li);
-            return;
           } else if (item.line) {
-            // Linie als dünner Streifen in der Mitte
             symbol.style.background = 'transparent';
             symbol.style.position = 'relative';
             const line = document.createElement('div');
@@ -397,18 +391,19 @@ function updateLegend() {
             line.style.backgroundColor = item.color || 'black';
             line.style.transform = 'translateY(-50%)';
             symbol.appendChild(line);
-          }  else if (item.stripes) {
+            li.appendChild(symbol);
+          } else if (item.stripes) {
             symbol.style.backgroundImage = `repeating-linear-gradient(
               to right,
               ${item.color} 0 2px,
               white 2px 4px
             )`;
+            li.appendChild(symbol);
           } else if (item.color) {
-            // Einfache Farbfläche
             symbol.style.backgroundColor = item.color;
+            li.appendChild(symbol);
           }
 
-          li.appendChild(symbol);
           li.appendChild(document.createTextNode(item.label));
           legendList.appendChild(li);
         });
@@ -416,6 +411,7 @@ function updateLegend() {
     }
   });
 
+  // Legendentitel nur anzeigen, wenn Elemente vorhanden
   legendTitle.style.display = legendList.children.length > 0 ? 'block' : 'none';
   adjustLegendPadding();
 }
@@ -438,6 +434,7 @@ window.addEventListener('resize', adjustLegendPadding);
 
 </body>
 </html>
+
 
 
 
