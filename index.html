@@ -20,25 +20,22 @@
       overflow: hidden;
     }
 
-    /* Linke Hauptspalte: Karte */
     #main-column {
       display: flex;
       flex-direction: column;
       flex: 1;
       overflow-y: auto;
       background: #fff;
-      align-items: center; /* center map horizontally */
+      align-items: center;
     }
 
-    /* Map container */
     #map-container {
       position: relative;
       width: 100%;
       display: flex;
-      justify-content: center; /* center map-inner */
+      justify-content: center;
     }
 
-    /* Inner wrapper for scaling */
     #map-inner {
       position: relative;
       width: 100%;
@@ -47,7 +44,6 @@
       transform-origin: center top;
     }
 
-    /* Layers */
     .layer {
       position: absolute;
       top: 0;
@@ -57,7 +53,7 @@
       display: none;
     }
 
-    /* Layer-Z Reihenfolge */
+    /* Layer order */
     #Analysekarte-Bauzonen { z-index: 0; }
     #Analysekarte-Strassenlärm { z-index: 1; }
     #Analysekarte-Glatt { z-index: 2; display: block; }
@@ -70,7 +66,7 @@
     #Analysekarte-Fussgängerstreifen { z-index: 9; }
     #Analysekarte-Busstationen { z-index: 10; }
 
-    /* Rechte Spalte: Sidebar */
+    /* Sidebar */
     #sidebar {
       width: 200px;
       display: flex;
@@ -91,7 +87,7 @@
       flex: 1;
       margin: 0 2px;
       padding: 2px 0;
-      font-size: 12px; /* smaller than layer buttons */
+      font-size: 12px;
       cursor: pointer;
       border: none;
       border-radius: 4px;
@@ -126,6 +122,16 @@
       color: white;
     }
 
+    /* Source tab */
+    #source-tab {
+      text-align: center;
+      font-size: 11px;
+      color: #777;
+      border-top: 1px solid #ddd;
+      margin-top: 6px;
+      padding-top: 2px;
+    }
+
     /* Legend */
     #legend-container {
       flex: 1;
@@ -137,6 +143,7 @@
     #legend-container h3 {
       margin: 0 0 2px 0;
       padding: 0;
+      display: none; /* hidden by default */
     }
 
     #legend-list {
@@ -162,10 +169,8 @@
 </head>
 <body>
 
-  <!-- Linke Spalte: Karte -->
+  <!-- Left: map -->
   <div id="main-column">
-
-    <!-- Map container -->
     <div id="map-container">
       <div id="map-inner">
         <img src="Analysekarte-Basekarte.png" class="layer" id="Analysekarte-Basekarte">
@@ -183,10 +188,9 @@
     </div>
   </div>
 
-  <!-- Rechte Spalte: Sidebar -->
+  <!-- Right: sidebar -->
   <div id="sidebar">
 
-    <!-- Zoom buttons above layer buttons -->
     <div id="zoom-controls">
       <button onclick="zoomMap(-5)">-</button>
       <button onclick="zoomDefault()">100%</button>
@@ -205,21 +209,25 @@
       <button onclick="toggleLayer('Analysekarte-Unfälle', this)">Unfälle</button>
     </div>
 
+    <!-- new source tab -->
+    <div id="source-tab">
+      Quelle: Stadt Opfikon, GIS-Daten 2025
+    </div>
+
     <div id="legend-container">
-      <h3>Legende</h3>
+      <h3 id="legend-title">Legende</h3>
       <ul id="legend-list"></ul>
     </div>
   </div>
 
   <script>
-    // Zoom
-    let zoom = 100; // percent
+    let zoom = 100;
 
     function zoomMap(change) {
       zoom += change;
-      if (zoom < 50) zoom = 50;   // min zoom
-      if (zoom > 200) zoom = 200; // max zoom
-      document.getElementById('map-inner').style.transform = `scale(${zoom/100})`;
+      if (zoom < 50) zoom = 50;
+      if (zoom > 200) zoom = 200;
+      document.getElementById('map-inner').style.transform = `scale(${zoom / 100})`;
     }
 
     function zoomDefault() {
@@ -227,7 +235,6 @@
       document.getElementById('map-inner').style.transform = `scale(1)`;
     }
 
-    // Layer toggling
     function toggleLayer(id, button) {
       const el = document.getElementById(id);
       if (el.style.display === 'block') {
@@ -240,7 +247,6 @@
       updateLegend();
     }
 
-    // Layer legends
     const layerLegends = {
       "Analysekarte-Bauzonen": [
         { label: "Wohngebiet", color: "#FFAAAA" },
@@ -291,7 +297,9 @@
 
     function updateLegend() {
       const legendList = document.getElementById('legend-list');
+      const legendTitle = document.getElementById('legend-title');
       legendList.innerHTML = '';
+
       Object.keys(layerLegends).forEach(layerId => {
         const el = document.getElementById(layerId);
         if (el.style.display === 'block') {
@@ -302,6 +310,9 @@
           });
         }
       });
+
+      // Show/hide title based on legend content
+      legendTitle.style.display = legendList.children.length > 0 ? 'block' : 'none';
     }
 
     // Show base layers initially
