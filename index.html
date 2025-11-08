@@ -176,6 +176,15 @@
    background-repeat: no-repeat;
    background-position: center;
  }
+
+ #legend-list li img {
+  display: inline-block;
+  width: 20px;
+  height: 20px;
+  object-fit: contain;
+  margin-right: 5px;
+  vertical-align: middle;
+}
  
 </style>
 </head>
@@ -364,8 +373,17 @@ function updateLegend() {
           const symbol = document.createElement('span');
 
           if (item.icon) {
-            // Icon-Hintergrund
-            symbol.style.backgroundImage = `url(${item.icon})`;
+            const img = document.createElement('img');
+            img.src = item.icon;
+            img.alt = item.label;
+            img.style.width = '20px';
+            img.style.height = '20px';
+            img.style.objectFit = 'contain';
+            img.style.marginRight = '5px';
+            li.appendChild(img);
+            li.appendChild(document.createTextNode(item.label));
+            legendList.appendChild(li);
+            return;
           } else if (item.line) {
             // Linie als dünner Streifen in der Mitte
             symbol.style.background = 'transparent';
@@ -379,11 +397,10 @@ function updateLegend() {
             line.style.backgroundColor = item.color || 'black';
             line.style.transform = 'translateY(-50%)';
             symbol.appendChild(line);
-          } else if (item.stripes) {
-            // Streifenmuster (z. B. rot/weiß)
+          }  else if (item.stripes) {
             symbol.style.backgroundImage = `repeating-linear-gradient(
-              45deg,
-              ${item.color || 'black'} 0 2px,
+              to right,
+              ${item.color} 0 2px,
               white 2px 4px
             )`;
           } else if (item.color) {
@@ -421,5 +438,6 @@ window.addEventListener('resize', adjustLegendPadding);
 
 </body>
 </html>
+
 
 
