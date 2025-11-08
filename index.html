@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Opfikon Au, Analysekarte</title>
+  <title>Opfikon Au, Analysekarte1</title>
   <style>
     * {
       margin: 0;
@@ -81,16 +81,16 @@
 
     #zoom-controls {
       display: grid;
-      grid-template-columns: repeat(3, 1fr);
+      grid-template-columns: repeat(5, 1fr);
       gap: 4px;
       width: 100%;
       margin-bottom: 4px;
     }
-    
+
     #zoom-controls button {
       width: 100%;
-      padding: 2px 4px;
-      font-size: 14px;
+      padding: 2px 4px; /* gleich wie layer buttons */
+      font-size: 12px; /* kleiner als layer buttons */
       cursor: pointer;
       border: none;
       border-radius: 4px;
@@ -201,9 +201,11 @@
   <div id="sidebar">
 
     <div id="zoom-controls">
-      <button onclick="zoomMap(-5)">-</button>
+      <button onclick="zoomMap(-10)">−−</button>
+      <button onclick="zoomMap(-5)">−</button>
       <button id="zoom-default" onclick="zoomDefault()">100%</button>
       <button onclick="zoomMap(5)">+</button>
+      <button onclick="zoomMap(10)">++</button>
     </div>
 
     <div id="buttons">
@@ -338,4 +340,5 @@
 
 </body>
 </html>
+
 
