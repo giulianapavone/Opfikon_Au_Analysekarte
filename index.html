@@ -170,6 +170,12 @@
       margin-right: 5px;
     }
 
+    #legend-list li img {
+      width: 20px;
+      height: auto;
+      max-height: 20px;
+    }
+
     #legend-list li strong { margin-bottom: 2px; display: block; }
   </style>
 </head>
@@ -208,13 +214,13 @@
     <div id="buttons">
       <button onclick="toggleLayer('Analysekarte-Bauzonen', this)">Bauzonen</button>
       <button onclick="toggleLayer('Analysekarte-Gebäudealter', this)">Gebäudealter</button>
-      <button onclick="toggleLayer('Analysekarte-Strassenlärm', this)">Strassenlärm</button>
-      <button onclick="toggleLayer('Analysekarte-Fluglärm', this)">Fluglärm</button>
       <button onclick="toggleLayer('Analysekarte-Fusswege', this)">Fusswege</button>
       <button onclick="toggleLayer('Analysekarte-Fussgängerstreifen', this)">Fussgängerstreifen</button>
       <button onclick="toggleLayer('Analysekarte-Velowege', this)">Velowege</button>
       <button onclick="toggleLayer('Analysekarte-Busstationen', this)">Busstationen</button>
       <button onclick="toggleLayer('Analysekarte-Unfälle', this)">Unfälle</button>
+      <button onclick="toggleLayer('Analysekarte-Strassenlärm', this)">Strassenlärm</button>
+      <button onclick="toggleLayer('Analysekarte-Fluglärm', this)">Fluglärm</button>
     </div>
 
     <div id="legend-container">
@@ -224,9 +230,8 @@
 
   </div>
 
-  <!-- fixed Quelle tab at bottom -->
   <div id="source-tab">
-    Quellen: GIS-Daten 2025, Geo Admin-Daten & Google Maps
+    Quellen: GIS, Swisstopo & Google Maps 2025
   </div>
   
   <script>
@@ -263,28 +268,6 @@
     }
 
     const layerLegends = [
-      {
-        title: "Durchschnittlicher Strassenlärm in dB(A), 06:00-22:00",
-        layers: [
-          { id: "Analysekarte-Strassenlärm", items: [
-              { label: ">= 75 dB(A)", color: "#787fab" },
-              { label: "70-74.9 dB(A)", color: "#bfadcc" },
-              { label: "65-69.9 dB(A)", color: "#aa6974" },
-              { label: "60-64.9 dB(A)", color: "#eb7878" },
-              { label: "55-59.9 dB(A)", color: "#ee966e" },
-              { label: "50-54.9 dB(A)", color: "#f9cc85" },
-              { label: "45-49.9 dB(A)", color: "#eee86e" },
-              { label: "40-44.9 dB(A)", color: "#677b64" }
-          ]}
-        ]
-      },
-      {
-        title: "Fluglärmlinie in dB(A)",
-        layers: [
-              { label: "65 dB(A)", color: "#007d1d, line: true" }
-          ]}
-        ]
-      },
       {
         title: "Bauzonen",
         layers: [
@@ -328,7 +311,30 @@
               { label: "Bushaltestellen", icon: "Bushaltestellensymbol.png" },
           ]},
           { id: "Analysekarte-Unfälle", items: [
-              { label: "Unfälle seit 2011 bos Anfangs 2025", icon: "Unfällesymbol.png" },
+              { label: "Unfälle seit 2011 bis Anfang 2025", icon: "Unfällesymbol.png" },
+          ]}
+        ]
+      },
+      {
+        title: "Durchschnittlicher Strassenlärm in dB(A), 06:00-22:00",
+        layers: [
+          { id: "Analysekarte-Strassenlärm", items: [
+              { label: ">= 75 dB(A)", color: "#787fab" },
+              { label: "70-74.9 dB(A)", color: "#bfadcc" },
+              { label: "65-69.9 dB(A)", color: "#aa6974" },
+              { label: "60-64.9 dB(A)", color: "#eb7878" },
+              { label: "55-59.9 dB(A)", color: "#ee966e" },
+              { label: "50-54.9 dB(A)", color: "#f9cc85" },
+              { label: "45-49.9 dB(A)", color: "#eee86e" },
+              { label: "40-44.9 dB(A)", color: "#677b64" }
+          ]}
+        ]
+      },
+      {
+        title: "Fluglärmlinie in dB(A)",
+        layers: [
+          { id: "Analysekarte-Fluglärm", items: [
+              { label: "65 dB(A)", color: "#007d1d", line: true }
           ]}
         ]
       }
@@ -354,7 +360,13 @@
               if (item.icon) {
                 li.innerHTML = `<img src="${item.icon}" alt="${item.label}">${item.label}`;
               } else if (item.color) {
-                li.innerHTML = `<span style="background:${item.color};"></span>${item.label}`;
+                if (item.line) {
+                  li.innerHTML = `<span style="display:inline-block;width:30px;height:4px;background:${item.color};margin-right:5px;vertical-align:middle;"></span>${item.label}`;
+                } else if (item.stripe === "vertical") {
+                  li.innerHTML = `<span style="display:inline-block;width:6px;height:20px;background:${item.color};background-image:repeating-linear-gradient(90deg, ${item.color}, ${item.color} 2px, #fff 2px, #fff 4px);margin-right:5px;"></span>${item.label}`;
+                } else {
+                  li.innerHTML = `<span style="background:${item.color};width:20px;height:20px;margin-right:5px;display:inline-block;"></span>${item.label}`;
+                }
               }
               legendList.appendChild(li);
             });
@@ -385,5 +397,3 @@
 
 </body>
 </html>
-
-
