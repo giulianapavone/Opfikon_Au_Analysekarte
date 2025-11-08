@@ -264,23 +264,24 @@
 
     const layerLegends = [
       {
-        title: "Verkehr",
+        title: "Durchschnittlicher Strassenlärm in dB(A), 06:00-22:00",
         layers: [
-          { id: "Analysekarte-Fusswege", items: [
-              { label: "Fussgänger zugängliche Wege", color: "#ee000b", line: true },
-              { label: "fehlende Fusswege", color: "#ee000b", stripe: "vertical" },
-          ]},
-          { id: "Analysekarte-Fussgängerstreifen", items: [
-              { label: "Fussgängerstreifen", icon: "Fussgängerstreifensymbol.png" },
-          ]},
-          { id: "Analysekarte-Velowege", items: [
-              { label: "Veloweg", color: "#000aee", line: true },
-          ]},
-          { id: "Analysekarte-Busstationen", items: [
-              { label: "Bushaltestellen", icon: "bushaltestellensymbol.png" },
-          ]},
-          { id: "Analysekarte-Unfälle", items: [
-              { label: "Unfälle seit 2011 bos Anfangs 2025", icon: "unfällesymbol.png" },
+          { id: "Analysekarte-Strassenlärm", items: [
+              { label: ">= 75 dB(A)", color: "#787fab" },
+              { label: "70-74.9 dB(A)", color: "#bfadcc" },
+              { label: "65-69.9 dB(A)", color: "#aa6974" },
+              { label: "60-64.9 dB(A)", color: "#eb7878" },
+              { label: "55-59.9 dB(A)", color: "#ee966e" },
+              { label: "50-54.9 dB(A)", color: "#f9cc85" },
+              { label: "45-49.9 dB(A)", color: "#eee86e" },
+              { label: "40-44.9 dB(A)", color: "#677b64" }
+          ]}
+        ]
+      },
+      {
+        title: "Fluglärmlinie in dB(A)",
+        layers: [
+              { label: "65 dB(A)", color: "#007d1d, line: true" }
           ]}
         ]
       },
@@ -311,24 +312,23 @@
         ]
       },
       {
-        title: "Durchschnittlicher Strassenlärm in dB(A), 06:00-22:00",
+        title: "Verkehr",
         layers: [
-          { id: "Analysekarte-Strassenlärm", items: [
-              { label: ">= 75 dB(A)", color: "#787fab" },
-              { label: "70-74.9 dB(A)", color: "#bfadcc" },
-              { label: "65-69.9 dB(A)", color: "#aa6974" },
-              { label: "60-64.9 dB(A)", color: "#eb7878" },
-              { label: "55-59.9 dB(A)", color: "#ee966e" },
-              { label: "50-54.9 dB(A)", color: "#f9cc85" },
-              { label: "45-49.9 dB(A)", color: "#eee86e" },
-              { label: "40-44.9 dB(A)", color: "#677b64" }
-          ]}
-        ]
-      },
-      {
-        title: "Fluglärmlinie in dB(A)",
-        layers: [
-              { label: "65 dB(A)", color: "#007d1d, line: true" }
+          { id: "Analysekarte-Fusswege", items: [
+              { label: "Fussgänger zugängliche Wege", color: "#ee000b", line: true },
+              { label: "fehlende Fusswege", color: "#ee000b", stripe: "vertical" },
+          ]},
+          { id: "Analysekarte-Fussgängerstreifen", items: [
+              { label: "Fussgängerstreifen", icon: "Fussgängerstreifensymbol.png" },
+          ]},
+          { id: "Analysekarte-Velowege", items: [
+              { label: "Veloweg", color: "#000aee", line: true },
+          ]},
+          { id: "Analysekarte-Busstationen", items: [
+              { label: "Bushaltestellen", icon: "Bushaltestellensymbol.png" },
+          ]},
+          { id: "Analysekarte-Unfälle", items: [
+              { label: "Unfälle seit 2011 bos Anfangs 2025", icon: "Unfällesymbol.png" },
           ]}
         ]
       }
@@ -385,4 +385,5 @@
 
 </body>
 </html>
+
 
