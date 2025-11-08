@@ -55,15 +55,15 @@
 
   /* Layer order */
   #Analysekarte-Bauzonen { z-index: 0; }
-  #Analysekarte-Strassenlärm { z-index: 1; }
+  #Analysekarte-Strassenlaerm { z-index: 1; }
   #Analysekarte-Glatt { z-index: 2; display: block; }
-  #Analysekarte-Gebäudealter { z-index: 3; }
+  #Analysekarte-Gebaeudealter { z-index: 3; }
   #Analysekarte-Fusswege { z-index: 4; }
   #Analysekarte-Velowege { z-index: 5; }
-  #Analysekarte-Fluglärm { z-index: 6; }
+  #Analysekarte-Fluglaerm { z-index: 6; }
   #Analysekarte-Basekarte { z-index: 7; display: block; }
-  #Analysekarte-Unfälle { z-index: 8; }
-  #Analysekarte-Fussgängerstreifen { z-index: 9; }
+  #Analysekarte-Unfaelle { z-index: 8; }
+  #Analysekarte-Fussgaengerstreifen { z-index: 9; }
   #Analysekarte-Busstationen { z-index: 10; }
 
   /* Sidebar */
@@ -165,7 +165,7 @@
     font-size: 14px;
   }
 
- /* Einheitlicher Stil für alle Legendensymbole */
+ /* Einheitlicher Stil fuer alle Legendensymbole */
  #legend-list li span {
    display: inline-block;
    width: 20px;
@@ -196,14 +196,14 @@
     <div id="map-inner">
       <img src="Analysekarte-Basekarte.png" class="layer" id="Analysekarte-Basekarte">
       <img src="Analysekarte-Bauzonen.png" class="layer" id="Analysekarte-Bauzonen">
-      <img src="Analysekarte-Strassenlärm.png" class="layer" id="Analysekarte-Strassenlärm">
+      <img src="Analysekarte-Strassenlaerm.png" class="layer" id="Analysekarte-Strassenlaerm">
       <img src="Analysekarte-Glatt.png" class="layer" id="Analysekarte-Glatt">
-      <img src="Analysekarte-Gebäudealter.png" class="layer" id="Analysekarte-Gebäudealter">
+      <img src="Analysekarte-Gebaeudealter.png" class="layer" id="Analysekarte-Gebaeudealter">
       <img src="Analysekarte-Fusswege.png" class="layer" id="Analysekarte-Fusswege">
       <img src="Analysekarte-Velowege.png" class="layer" id="Analysekarte-Velowege">
-      <img src="Analysekarte-Fluglärm.png" class="layer" id="Analysekarte-Fluglärm">
-      <img src="Analysekarte-Unfälle.png" class="layer" id="Analysekarte-Unfälle">
-      <img src="Analysekarte-Fussgängerstreifen.png" class="layer" id="Analysekarte-Fussgängerstreifen">
+      <img src="Analysekarte-Fluglaerm.png" class="layer" id="Analysekarte-Fluglaerm">
+      <img src="Analysekarte-Unfaelle.png" class="layer" id="Analysekarte-Unfaelle">
+      <img src="Analysekarte-Fussgaengerstreifen.png" class="layer" id="Analysekarte-Fussgaengerstreifen">
       <img src="Analysekarte-Busstationen.png" class="layer" id="Analysekarte-Busstationen">
     </div>
   </div>
@@ -222,14 +222,14 @@
 
   <div id="buttons">
     <button onclick="toggleLayer('Analysekarte-Bauzonen', this)">Bauzonen</button>
-    <button onclick="toggleLayer('Analysekarte-Gebäudealter', this)">Gebäudealter</button>
+    <button onclick="toggleLayer('Analysekarte-Gebaeudealter', this)">Gebaeudealter</button>
     <button onclick="toggleLayer('Analysekarte-Fusswege', this)">Fusswege</button>
-    <button onclick="toggleLayer('Analysekarte-Fussgängerstreifen', this)">Fussgängerstreifen</button>
+    <button onclick="toggleLayer('Analysekarte-Fussgaengerstreifen', this)">Fussgaengerstreifen</button>
     <button onclick="toggleLayer('Analysekarte-Velowege', this)">Velowege</button>
     <button onclick="toggleLayer('Analysekarte-Busstationen', this)">Busstationen</button>
-    <button onclick="toggleLayer('Analysekarte-Unfälle', this)">Unfälle</button>
-    <button onclick="toggleLayer('Analysekarte-Strassenlärm', this)">Strassenlärm</button>
-    <button onclick="toggleLayer('Analysekarte-Fluglärm', this)">Fluglärm</button>
+    <button onclick="toggleLayer('Analysekarte-Unfaelle', this)">Unfaelle</button>
+    <button onclick="toggleLayer('Analysekarte-Strassenlaerm', this)">Strassenlaerm</button>
+    <button onclick="toggleLayer('Analysekarte-Fluglaerm', this)">Fluglaerm</button>
   </div>
 
   <div id="legend-container">
@@ -292,7 +292,7 @@ const layerLegends = [
   {
     title: "Baujahr",
     layers: [
-      { id:"Analysekarte-Gebäudealter", items:[
+      { id:"Analysekarte-Gebaeudealter", items:[
         {label:"1926-1950", color:"#c3268a"},
         {label:"1951-1960", color:"#ec5689"},
         {label:"1961-1970", color:"#f4737e"},
@@ -308,11 +308,11 @@ const layerLegends = [
     title: "Verkehr",
     layers: [
       { id:"Analysekarte-Fusswege", items:[
-        {label:"Fussgängerzugängliche Wege", line:true, color:"#ee000b"},
+        {label:"Fussgaengerzugaengliche Wege", line:true, color:"#ee000b"},
         {label:"fehlende Fusswege", stripes:true, color:"#ee000b"}
       ]},
-      { id:"Analysekarte-Fussgängerstreifen", items:[
-        {label:"Fussgängerstreifen", icon:"Fussgängerstreifensymbol.png"}
+      { id:"Analysekarte-Fussgaengerstreifen", items:[
+        {label:"Fussgaengerstreifen", icon:"Fussgaengerstreifensymbol.png"}
       ]},
       { id:"Analysekarte-Velowege", items:[
         {label:"Veloweg", line:true, color:"#000aee"}
@@ -320,15 +320,15 @@ const layerLegends = [
       { id:"Analysekarte-Busstationen", items:[
         {label:"Bushaltestellen", icon:"Bushaltestellensymbol.png"}
       ]},
-      { id:"Analysekarte-Unfälle", items:[
-        {label:"Unfälle 2011-2025", icon:"Unfällesymbol.png"}
+      { id:"Analysekarte-Unfaelle", items:[
+        {label:"Unfaelle 2011-2025", icon:"Unfaellesymbol.png"}
       ]}
     ]
   },
   {
-    title:"Durchschnittlicher Strassenlärm in dB(A), 06:00-22:00",
+    title:"Durchschnittlicher Strassenlaerm in dB(A), 06:00-22:00",
     layers:[
-      {id:"Analysekarte-Strassenlärm", items:[
+      {id:"Analysekarte-Strassenlaerm", items:[
         {label:">= 75 dB(A)", color:"#787fab"},
         {label:"70-74.9 dB(A)", color:"#bfadcc"},
         {label:"65-69.9 dB(A)", color:"#aa6974"},
@@ -341,9 +341,9 @@ const layerLegends = [
     ]
   },
   {
-    title:"Fluglärm",
+    title:"Fluglaerm",
     layers:[
-      {id:"Analysekarte-Fluglärm", items:[
+      {id:"Analysekarte-Fluglaerm", items:[
         {label:"65 dB(A)", line:true, color:"#007d1d"}
       ]}
     ]
@@ -440,6 +440,7 @@ window.addEventListener('resize', adjustLegendPadding);
 
 </body>
 </html>
+
 
 
 
