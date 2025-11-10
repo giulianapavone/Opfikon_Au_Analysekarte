@@ -54,17 +54,18 @@
   }
 
   /* Layer order */
-  #Analysekarte-Bauzonen { z-index: 0; }
-  #Analysekarte-Strassenlaerm { z-index: 1; }
-  #Analysekarte-Glatt { z-index: 2; display: block; }
-  #Analysekarte-Gebaeudealter { z-index: 3; }
-  #Analysekarte-Velowege { z-index: 4; }
-  #Analysekarte-Fusswege { z-index: 5; }
-  #Analysekarte-Fluglaerm { z-index: 6; }
-  #Analysekarte-Basekarte { z-index: 7; display: block; }
-  #Analysekarte-Unfaelle { z-index: 8; }
-  #Analysekarte-Fussgaengerstreifen { z-index: 9; }
-  #Analysekarte-Busstationen { z-index: 10; }
+  #Analysekarte-Glatt { z-index: 0; display: block; }
+  #Analysekarte-Bauzonen { z-index: 1; }
+  #Analysekarte-Strassenlaerm { z-index: 2; }
+  #Analysekarte-Eigentuemer { z-index: 3; }
+  #Analysekarte-Gebaeudealter { z-index: 4; }
+  #Analysekarte-Velowege { z-index: 5; }
+  #Analysekarte-Fusswege { z-index: 6; }
+  #Analysekarte-Fluglaerm { z-index: 7; }
+  #Analysekarte-Basekarte { z-index: 8; display: block; }
+  #Analysekarte-Unfaelle { z-index: 9; }
+  #Analysekarte-Fussgaengerstreifen { z-index: 10; }
+  #Analysekarte-Busstationen { z-index: 11; }
 
   /* Sidebar */
   #sidebar {
@@ -148,7 +149,7 @@
     position: sticky;
     top: 0;
     background: #fff;
-    z-index: 10;
+    z-index: 12;
     display: none;
     font-weight: bold;
   }
@@ -204,6 +205,7 @@
       <img src="Analysekarte-Unfaelle.png" class="layer" id="Analysekarte-Unfaelle">
       <img src="Analysekarte-Fussgaengerstreifen.png" class="layer" id="Analysekarte-Fussgaengerstreifen">
       <img src="Analysekarte-Busstationen.png" class="layer" id="Analysekarte-Busstationen">
+      <img src="Analysekarte-Eigentuemer.png" class="layer" id="Analysekarte-Eigentuemer">
     </div>
   </div>
 </div>
@@ -222,6 +224,7 @@
   <div id="buttons">
     <button onclick="toggleLayer('Analysekarte-Bauzonen', this)">Bauzonen</button>
     <button onclick="toggleLayer('Analysekarte-Gebaeudealter', this)">Gebäudealter</button>
+    <button onclick="toggleLayer('Analysekarte-Eigentuemer', this)">Grundeigentümer</button>
     <button onclick="toggleLayer('Analysekarte-Fusswege', this)">Fusswege</button>
     <button onclick="toggleLayer('Analysekarte-Fussgaengerstreifen', this)">Fussgängerstreifen</button>
     <button onclick="toggleLayer('Analysekarte-Velowege', this)">Velowege</button>
@@ -300,6 +303,17 @@ const layerLegends = [
         {label:"1991-2000", color:"#e0cb6e"},
         {label:"2001-2010", color:"#c8e17c"},
         {label:"2011-heute", color:"#88e17c"}
+      ]}
+    ]
+  },
+  {
+    title: "Grundeigentümer: Partie pro Farbton",
+    layers: [
+      { id:"Analysekarte-Eigentuemer", items:[
+        {label:"Genossenchaften", gradient: "linear-gradient(to right, #64b5f6, #1976d2)"},
+        {label:"Aktiengesellschaften", gradient: "linear-gradient(to right, #ffc1c1, #8b0000)"},
+        {label:"Privates Eigentümer", gradient: "linear-gradient(to right, #d5f5e3, #0a3211)"},
+        {label:"Stockwerkeigentum", color:"#999999"}
       ]}
     ]
   },
@@ -402,8 +416,11 @@ function updateLegend() {
               ${item.color} 0 2px,
               white 2px 4px
             )`;
+          } else if (item.gradient) {
+            // Farbverlauf
+            symbol.style.backgroundImage = item.gradient;
           } else if (item.color) {
-            // Solid color
+            // Einzelfarbe
             symbol.style.backgroundColor = item.color;
           }
 
@@ -439,12 +456,3 @@ window.addEventListener('resize', adjustLegendPadding);
 
 </body>
 </html>
-
-
-
-
-
-
-
-
-
