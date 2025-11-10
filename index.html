@@ -394,12 +394,7 @@ function updateLegend() {
             const liSubtitle = document.createElement('li');
             liSubtitle.textContent = item.label;
             liSubtitle.style.fontWeight = 'bold';
-            liSubtitle.style.marginTop = '4px';
-            liSubtitle.style.marginBottom = '2px';
             liSubtitle.style.fontSize = '13px';
-            liSubtitle.style.color = '#333';
-            liSubtitle.style.borderTop = '1px solid #ddd';
-            liSubtitle.style.paddingTop = '3px';
             legendList.appendChild(liSubtitle);
             return; // nächsten Item überspringen
           }
@@ -477,4 +472,5 @@ window.addEventListener('resize', adjustLegendPadding);
 
 </body>
 </html>
+
 
