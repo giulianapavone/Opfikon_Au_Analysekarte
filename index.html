@@ -310,10 +310,14 @@ const layerLegends = [
    title: "Grundeigentümer",
    layers: [
      { id: "Analysekarte-Eigentuemer", items: [
-       { label: "Genossenschaften (Partie pro Farbton)", gradient: "linear-gradient(to right, #2196f3, #0d47a1)" },
-       { label: "Aktiengesellschaften (Partie pro Farbton)", gradient: "linear-gradient(to right, #ef5350, #8b0000)" },
-       { label: "Private Eigentümer (Partie pro Farbton)", gradient: "linear-gradient(to right, #81c784, #1b5e20)" },
-       { label: "Stockwerkeigentum", color: "#999999" }
+       { label: "Stockwerkeigentum", color: "#999999" },
+       
+       // 👇 Zwischenüberschrift:
+       { label: "Farbton pro Partie", subtitle: true },
+       
+       { label: "Genossenschaften", gradient: "linear-gradient(to right, #2196f3, #0d47a1)" },
+       { label: "Aktiengesellschaften", gradient: "linear-gradient(to right, #ef5350, #8b0000)" },
+       { label: "Private Eigentümer", gradient: "linear-gradient(to right, #81c784, #1b5e20)" }
      ]}
    ]
   },
@@ -366,25 +370,43 @@ const layerLegends = [
 function updateLegend() {
   const legendList = document.getElementById('legend-list');
   const legendTitle = document.getElementById('legend-title');
-  legendList.innerHTML = ''; // clear old items
+  legendList.innerHTML = ''; // alte Einträge löschen
 
   layerLegends.forEach(group => {
-    // Only include visible layers
+    // Nur aktive Layer anzeigen
     const activeLayers = group.layers.filter(layer =>
       document.getElementById(layer.id).style.display === 'block'
     );
 
     if (activeLayers.length > 0) {
-      // Group title
+      // Gruppentitel (z. B. "Grundeigentümer")
       const liGroup = document.createElement('li');
       liGroup.innerHTML = `<strong>${group.title}</strong>`;
+      liGroup.style.marginTop = '6px';
+      liGroup.style.fontSize = '15px';
       legendList.appendChild(liGroup);
 
       activeLayers.forEach(layer => {
         layer.items.forEach(item => {
+
+          // 🧩 Untertitel einfügen
+          if (item.subtitle) {
+            const liSubtitle = document.createElement('li');
+            liSubtitle.textContent = item.label;
+            liSubtitle.style.fontWeight = 'bold';
+            liSubtitle.style.marginTop = '4px';
+            liSubtitle.style.marginBottom = '2px';
+            liSubtitle.style.fontSize = '13px';
+            liSubtitle.style.color = '#333';
+            liSubtitle.style.borderTop = '1px solid #ddd';
+            liSubtitle.style.paddingTop = '3px';
+            legendList.appendChild(liSubtitle);
+            return; // nächsten Item überspringen
+          }
+
+          // ⚙️ Normaler Legendeneintrag
           const li = document.createElement('li');
 
-          // Create a single 20x20 span for the symbol
           const symbol = document.createElement('span');
           symbol.style.width = '20px';
           symbol.style.height = '20px';
@@ -394,36 +416,35 @@ function updateLegend() {
           symbol.style.backgroundSize = 'contain';
           symbol.style.backgroundRepeat = 'no-repeat';
           symbol.style.backgroundPosition = 'center';
-          symbol.style.backgroundColor = ''; // reset any previous color
+          symbol.style.backgroundColor = '';
+          symbol.style.backgroundImage = '';
 
-          // Clear any previous children to avoid conflicts
-          while (symbol.firstChild) symbol.removeChild(symbol.firstChild);
-
-          // Determine symbol type
+          // 🖼️ Symbol-Typ bestimmen
           if (item.icon) {
-            // PNG icon
+            // Bildsymbol (PNG, SVG etc.)
             symbol.style.backgroundImage = `url('${item.icon}')`;
           } else if (item.line) {
-            // Horizontal line
+            // Linien-Symbol
             symbol.style.backgroundImage = `linear-gradient(to right, ${item.color} 100%, transparent 0)`;
             symbol.style.backgroundSize = '100% 4px';
             symbol.style.backgroundPosition = 'center';
             symbol.style.backgroundRepeat = 'no-repeat';
           } else if (item.stripes) {
-            // Stripes (horizontal)
+            // Schraffierung
             symbol.style.backgroundImage = `repeating-linear-gradient(
               to right,
               ${item.color} 0 2px,
               white 2px 4px
             )`;
           } else if (item.gradient) {
-            // Farbverlauf
+            // Verlauf (z. B. für Eigentümer)
             symbol.style.backgroundImage = item.gradient;
           } else if (item.color) {
             // Einzelfarbe
             symbol.style.backgroundColor = item.color;
           }
 
+          // Text anhängen
           li.appendChild(symbol);
           li.appendChild(document.createTextNode(item.label));
           legendList.appendChild(li);
@@ -432,10 +453,10 @@ function updateLegend() {
     }
   });
 
-  // Show legend title only if there are items
+  // Titel der Legende nur zeigen, wenn Einträge vorhanden sind
   legendTitle.style.display = legendList.children.length > 0 ? 'block' : 'none';
 
-  adjustLegendPadding(); // keep padding above source tab
+  adjustLegendPadding(); // Platz über Quelle-Tab halten
 }
 
 function adjustLegendPadding() {
@@ -456,3 +477,4 @@ window.addEventListener('resize', adjustLegendPadding);
 
 </body>
 </html>
+
