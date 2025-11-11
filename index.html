@@ -28,7 +28,7 @@
     background: #fff;
     align-items: center;
   }
-
+ 
   #map-container {
     position: relative;
     width: 100%;
@@ -460,14 +460,26 @@ function adjustLegendPadding() {
   legend.style.paddingBottom = source.offsetHeight + 'px';
 }
 
+function centerMapVertically() {
+  const container = document.getElementById('map-container');
+  const inner = document.getElementById('map-inner');
+  const offset = (inner.offsetHeight - container.offsetHeight) / 2;
+  container.scrollTop = offset > 0 ? offset : 0;
+}
+
+
 // Initialisierung
 document.getElementById('Analysekarte-Basekarte').style.display='block';
 document.getElementById('Analysekarte-Glatt').style.display='block';
 updateZoomDisplay();
 adjustLegendPadding();
 updateLegend();
+centerMapVertically();
 
-window.addEventListener('resize', adjustLegendPadding);
+// Direkt nach dem Initialisieren aufrufen
+window.addEventListener('load', centerMapVertically);
+window.addEventListener('resize', centerMapVertically);
+ 
 </script>
 
 </body>
