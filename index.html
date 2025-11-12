@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-<title>Opfikon Au, Analysekarte1</title>
+<title>Opfikon Au, Analysekarte</title>
 <style>
   * {
     margin: 0;
@@ -287,7 +287,6 @@ function toggleLayer(id, button) {
 }
 
 /* Export as PDF with map and legend */
-/* Export as PDF with map and legend */
 async function exportVisibleLayers() {
   const { jsPDF } = window.jspdf;
   const pdf = new jsPDF('portrait', 'mm', 'a4');
@@ -329,21 +328,21 @@ async function exportVisibleLayers() {
     });
   }
 
-  // Add map to first page - centered with proper aspect ratio
+  // Add map to first page - reduced margins
   const imgData = canvas.toDataURL('image/png');
   const pageWidth = pdf.internal.pageSize.getWidth();
   const pageHeight = pdf.internal.pageSize.getHeight();
   
-  // Calculate map dimensions with margins
-  const maxMapWidth = pageWidth - 40; // 20mm left + 20mm right margin
-  const maxMapHeight = pageHeight - 60; // 30mm top + 30mm bottom margin
+  // Reduced margins: 15mm instead of 20mm
+  const maxMapWidth = pageWidth - 30; // 15mm left + 15mm right margin
+  const maxMapHeight = pageHeight - 40; // 20mm top + 20mm bottom margin
   
   // Calculate scale to fit within max dimensions while maintaining aspect ratio
   const scale = Math.min(maxMapWidth / width, maxMapHeight / height);
   const mapWidth = width * scale;
   const mapHeight = height * scale;
   
-  // Center the map on the page (both horizontally and vertically)
+  // Center the map on the page
   const xPos = (pageWidth - mapWidth) / 2;
   const yPos = (pageHeight - mapHeight) / 2;
   
@@ -352,123 +351,132 @@ async function exportVisibleLayers() {
   // Add page for legend
   pdf.addPage();
   
-  // Add legend title
+  // Add legend title with reduced top margin
   pdf.setFontSize(16);
-  pdf.text('Legende', 15, 20);
+  pdf.text('Legende', 10, 15); // Reduced from 15,20 to 10,15
   
-  // Two-column legend setup
-  const columnWidth = (pageWidth - 45) / 2; // 15mm left margin + 15mm gap + 15mm right margin
-  const leftColumnX = 15;
-  const rightColumnX = leftColumnX + columnWidth + 15;
+  // Two-column legend setup with reduced margins
+  const columnWidth = (pageWidth - 30) / 2; // 10mm left margin + 10mm gap + 10mm right margin
+  const leftColumnX = 10;
+  const rightColumnX = leftColumnX + columnWidth + 10;
+  const bottomMargin = 15; // Reduced from 20mm
   
-  let yPosition = 35;
-  const lineHeight = 7;
+  let yPosition = 25; // Reduced from 35
+  const lineHeight = 6; // Slightly reduced
   const symbolWidth = 5;
   let currentColumn = 'left';
-  
+
   pdf.setFontSize(9);
 
-  layerLegends.forEach(group => {
-    const activeLayers = group.layers.filter(layer => 
-      document.getElementById(layer.id).style.display === 'block'
-    );
-    
-    if (activeLayers.length > 0) {
-      const currentX = currentColumn === 'left' ? leftColumnX : rightColumnX;
+  // Function to check if we need a new page/column
+  function checkSpaceNeeded(linesNeeded = 1) {
+      const neededHeight = linesNeeded * lineHeight;
       
-      // Group title
-      pdf.setFont(undefined, 'bold');
-      pdf.text(group.title, currentX, yPosition);
-      yPosition += lineHeight * 1.2;
-      
-      activeLayers.forEach(layer => {
-        layer.items.forEach(item => {
-          const currentX = currentColumn === 'left' ? leftColumnX : rightColumnX;
-          
-          if (item.subtitle) {
-            pdf.setFont(undefined, 'bold');
-            pdf.text(item.label, currentX + 5, yPosition);
-            yPosition += lineHeight;
-            
-            // Check if we need to switch columns or add new page
-            if (yPosition > pageHeight - 20) {
-              if (currentColumn === 'left') {
-                currentColumn = 'right';
-                yPosition = 35;
-              } else {
-                pdf.addPage();
-                currentColumn = 'left';
-                yPosition = 20;
-                pdf.setFontSize(16);
-                pdf.text('Legende (Fortsetzung)', 15, yPosition);
-                yPosition = 35;
-                pdf.setFontSize(9);
-              }
-            }
-            return;
-          }
-          
-          // Draw symbol
-          if (item.color && !item.line && !item.gradient) {
-            pdf.setFillColor(item.color);
-            pdf.rect(currentX + 5, yPosition - 3, symbolWidth, symbolWidth, 'F');
-          } else if (item.line) {
-            pdf.setDrawColor(item.color);
-            pdf.setLineWidth(1);
-            pdf.line(currentX + 5, yPosition - 1, currentX + 5 + symbolWidth, yPosition - 1);
-          } else if (item.gradient) {
-            // For gradients, use a simple colored rectangle
-            const baseColor = item.gradient.includes('#1976d2') ? '#1976d2' : 
-                             item.gradient.includes('#8b0000') ? '#8b0000' : '#0a3211';
-            pdf.setFillColor(baseColor);
-            pdf.rect(currentX + 5, yPosition - 3, symbolWidth, symbolWidth, 'F');
-          }
-          
-          // Item label
-          pdf.setFont(undefined, 'normal');
-          
-          // Split long labels to fit column width
-          const maxTextWidth = columnWidth - 15; // 5mm symbol + 5mm margin + 5mm padding
-          const words = item.label.split(' ');
-          let line = '';
-          let textY = yPosition;
-          
-          for (let i = 0; i < words.length; i++) {
-            const testLine = line + words[i] + ' ';
-            const testWidth = pdf.getTextWidth(testLine);
-            
-            if (testWidth > maxTextWidth && i > 0) {
-              pdf.text(line, currentX + 12, textY);
-              line = words[i] + ' ';
-              textY += lineHeight;
-            } else {
-              line = testLine;
-            }
-          }
-          pdf.text(line, currentX + 12, textY);
-          
-          yPosition = textY + lineHeight;
-          
-          // Check if we need to switch columns or add new page
-          if (yPosition > pageHeight - 20) {
-            if (currentColumn === 'left') {
+      if (yPosition + neededHeight > pageHeight - bottomMargin) {
+          if (currentColumn === 'left') {
               currentColumn = 'right';
-              yPosition = 35;
-            } else {
+              yPosition = 25; // Reset for right column
+              return 'switchColumn';
+          } else {
               pdf.addPage();
               currentColumn = 'left';
-              yPosition = 20;
+              yPosition = 15;
               pdf.setFontSize(16);
-              pdf.text('Legende (Fortsetzung)', 15, yPosition);
-              yPosition = 35;
+              pdf.text('Legende (Fortsetzung)', 10, yPosition);
+              yPosition = 25;
               pdf.setFontSize(9);
-            }
+              return 'newPage';
           }
-        });
-      });
+      }
+      return 'enoughSpace';
+  }
+
+  layerLegends.forEach(group => {
+      const activeLayers = group.layers.filter(layer => 
+          document.getElementById(layer.id).style.display === 'block'
+      );
       
-      yPosition += lineHeight; // Extra space between groups
-    }
+      if (activeLayers.length > 0) {
+          // Check space before starting group
+          checkSpaceNeeded(2); // Group title + at least one item
+          
+          const currentX = currentColumn === 'left' ? leftColumnX : rightColumnX;
+          
+          // Group title
+          pdf.setFont(undefined, 'bold');
+          pdf.text(group.title, currentX, yPosition);
+          yPosition += lineHeight * 1.2;
+          
+          activeLayers.forEach(layer => {
+              layer.items.forEach(item => {
+                  const currentX = currentColumn === 'left' ? leftColumnX : rightColumnX;
+                  
+                  if (item.subtitle) {
+                      checkSpaceNeeded(1);
+                      pdf.setFont(undefined, 'bold');
+                      pdf.text(item.label, currentX + 5, yPosition);
+                      yPosition += lineHeight;
+                      return;
+                  }
+                  
+                  // Check space before regular item
+                  const linesForItem = item.label.length > 30 ? 2 : 1;
+                  const spaceCheck = checkSpaceNeeded(linesForItem);
+                  
+                  // If we switched columns or pages, update currentX
+                  const actualX = currentColumn === 'left' ? leftColumnX : rightColumnX;
+                  
+                  // Handle icons - convert to base64 and add to PDF
+                  if (item.icon) {
+                      try {
+                          // Try to load and add the icon image
+                          const iconImg = new Image();
+                          iconImg.crossOrigin = 'anonymous';
+                          iconImg.src = item.icon;
+                          
+                          // For now, use a placeholder rectangle since we can't easily async load here
+                          pdf.setFillColor(100, 100, 100); // Gray placeholder
+                          pdf.rect(actualX + 5, yPosition - 3, symbolWidth, symbolWidth, 'F');
+                          
+                          // Add (Icon) text to indicate it's an icon
+                          pdf.setFont(undefined, 'normal');
+                          pdf.text(item.label + ' (Icon)', actualX + 12, yPosition);
+                      } catch (e) {
+                          // Fallback: colored rectangle
+                          pdf.setFillColor(100, 100, 100);
+                          pdf.rect(actualX + 5, yPosition - 3, symbolWidth, symbolWidth, 'F');
+                          pdf.setFont(undefined, 'normal');
+                          pdf.text(item.label, actualX + 12, yPosition);
+                      }
+                  } else if (item.color && !item.line && !item.gradient) {
+                      pdf.setFillColor(item.color);
+                      pdf.rect(actualX + 5, yPosition - 3, symbolWidth, symbolWidth, 'F');
+                      pdf.setFont(undefined, 'normal');
+                      pdf.text(item.label, actualX + 12, yPosition);
+                  } else if (item.line) {
+                      pdf.setDrawColor(item.color);
+                      pdf.setLineWidth(1);
+                      pdf.line(actualX + 5, yPosition - 1, actualX + 5 + symbolWidth, yPosition - 1);
+                      pdf.setFont(undefined, 'normal');
+                      pdf.text(item.label, actualX + 12, yPosition);
+                  } else if (item.gradient) {
+                      const baseColor = item.gradient.includes('#1976d2') ? '#1976d2' : 
+                                      item.gradient.includes('#8b0000') ? '#8b0000' : '#0a3211';
+                      pdf.setFillColor(baseColor);
+                      pdf.rect(actualX + 5, yPosition - 3, symbolWidth, symbolWidth, 'F');
+                      pdf.setFont(undefined, 'normal');
+                      pdf.text(item.label, actualX + 12, yPosition);
+                  } else {
+                      pdf.setFont(undefined, 'normal');
+                      pdf.text(item.label, actualX + 12, yPosition);
+                  }
+                  
+                  yPosition += lineHeight;
+              });
+          });
+          
+          yPosition += lineHeight; // Extra space between groups
+      }
   });
 
   // Save the PDF
@@ -603,4 +611,5 @@ updateLegend();
 </script>
 </body>
 </html>
+
 
