@@ -3,7 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Opfikon Au, Analysekarte</title>
+<title>Opfikon Au, Analysekarte1</title>
+<script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
 <style>
   * {
     margin: 0;
@@ -440,116 +441,29 @@ async function buildMapLayers(canvas, forExport = false) {
   return canvas;
 }
 
-/* Export legend using canvas - no external libraries needed */
+/* Export legend - uses the unified buildLegendContent function */
 async function exportLegendToCanvas() {
-  const legendCanvas = document.createElement('canvas');
-  const ctx = legendCanvas.getContext('2d');
+  const tempContainer = document.createElement('div');
+  tempContainer.style.position = 'fixed';
+  tempContainer.style.left = '0';
+  tempContainer.style.top = '0';
+  tempContainer.style.background = 'white';
+  tempContainer.style.padding = '320px';
+  tempContainer.style.border = '8px solid #ccc';
+  tempContainer.style.zIndex = '9999';
+  tempContainer.style.width = '2400px';
   
-  // Set high resolution
-  legendCanvas.width = 600;
+  document.body.appendChild(tempContainer);
   
-  // Calculate height based on content
-  const activeGroups = layerLegends.filter(group => 
-    group.layers.some(layer => document.getElementById(layer.id).style.display === 'block')
-  );
+  buildLegendContent(tempContainer, true);
   
-  if (activeGroups.length === 0) return null;
-  
-  let totalHeight = 80; // Title + padding
-  activeGroups.forEach(group => {
-    totalHeight += 40; // Group title
-    group.layers.forEach(layer => {
-      if (document.getElementById(layer.id).style.display === 'block') {
-        totalHeight += layer.items.length * 35; // Items
-      }
-    });
-    totalHeight += 20; // Group spacing
+  const legendCanvas = await html2canvas(tempContainer, {
+    scale: 8,
+    backgroundColor: '#ffffff',
+    useCORS: true
   });
   
-  legendCanvas.height = totalHeight;
-  
-  // Draw background
-  ctx.fillStyle = 'white';
-  ctx.fillRect(0, 0, legendCanvas.width, legendCanvas.height);
-  
-  // Draw title
-  ctx.fillStyle = 'black';
-  ctx.font = 'bold 24px sans-serif';
-  ctx.fillText('Legende', 40, 40);
-  
-  let yPos = 80;
-  
-  // Draw legend content
-  for (const group of activeGroups) {
-    // Group title
-    ctx.font = 'bold 20px sans-serif';
-    ctx.fillText(group.title, 40, yPos);
-    yPos += 40;
-    
-    // Group items
-    for (const layer of group.layers) {
-      if (document.getElementById(layer.id).style.display === 'block') {
-        for (const item of layer.items) {
-          if (item.subtitle) {
-            ctx.font = 'bold 16px sans-serif';
-            ctx.fillText(item.label, 60, yPos);
-            yPos += 30;
-            continue;
-          }
-          
-          // Draw symbol
-          const symbolSize = 25;
-          const symbolX = 60;
-          const symbolY = yPos - 18;
-          
-          if (item.icon) {
-            // Load and draw icon image
-            await new Promise((resolve) => {
-              const img = new Image();
-              img.onload = () => {
-                ctx.drawImage(img, symbolX, symbolY, symbolSize, symbolSize);
-                resolve();
-              };
-              img.src = item.icon;
-            });
-          } else if (item.line) {
-            ctx.strokeStyle = item.color;
-            ctx.lineWidth = 4;
-            ctx.beginPath();
-            ctx.moveTo(symbolX, symbolY + symbolSize/2);
-            ctx.lineTo(symbolX + symbolSize, symbolY + symbolSize/2);
-            ctx.stroke();
-          } else if (item.stripes) {
-            ctx.strokeStyle = item.color;
-            ctx.lineWidth = 3;
-            ctx.setLineDash([4, 4]);
-            ctx.beginPath();
-            ctx.moveTo(symbolX, symbolY + symbolSize/2);
-            ctx.lineTo(symbolX + symbolSize, symbolY + symbolSize/2);
-            ctx.stroke();
-            ctx.setLineDash([]);
-          } else if (item.gradient) {
-            // Handle gradients (simplified)
-            ctx.fillStyle = item.gradient.includes('#64b5f6') ? '#64b5f6' : 
-                           item.gradient.includes('#ffc1c1') ? '#ffc1c1' : '#d5f5e3';
-            ctx.fillRect(symbolX, symbolY, symbolSize, symbolSize);
-          } else if (item.color) {
-            ctx.fillStyle = item.color;
-            ctx.fillRect(symbolX, symbolY, symbolSize, symbolSize);
-          }
-          
-          // Draw label
-          ctx.fillStyle = 'black';
-          ctx.font = '16px sans-serif';
-          ctx.fillText(item.label, symbolX + symbolSize + 15, yPos);
-          
-          yPos += 35;
-        }
-      }
-    }
-    yPos += 20;
-  }
-  
+  document.body.removeChild(tempContainer);
   return legendCanvas;
 }
 
@@ -599,7 +513,7 @@ function adjustLegendPadding() {
   legend.style.paddingBottom = source.offsetHeight + 'px';
 }
 
-/* Export - completely self-contained, no external libraries */
+/* Export */
 async function exportVisibleLayers() {
   // Export map using universal builder
   const mapCanvas = document.createElement('canvas');
@@ -610,7 +524,7 @@ async function exportVisibleLayers() {
   mapLink.href = mapCanvas.toDataURL('image/png');
   mapLink.click();
 
-  // Export legend using canvas - no html2canvas needed!
+  // Export legend
   const legendCanvas = await exportLegendToCanvas();
   if (legendCanvas) {
     const legendLink = document.createElement('a');
@@ -628,3 +542,4 @@ updateLegend();
 </script>
 </body>
 </html>
+
