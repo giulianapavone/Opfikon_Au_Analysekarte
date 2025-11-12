@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-<title>Opfikon Au, Analysekarte</title>
+<title>Opfikon Au, Analysekarte1</title>
 <style>
   * {
     margin: 0;
@@ -286,11 +286,11 @@ function toggleLayer(id, button) {
   updateLegend();
 }
 
-/* Export */
+/* Export as PDF with map and legend */
 /* Export as PDF with map and legend */
 async function exportVisibleLayers() {
   const { jsPDF } = window.jspdf;
-  const pdf = new jsPDF('landscape', 'mm', 'a4');
+  const pdf = new jsPDF('portrait', 'mm', 'a4');
   
   // Get visible layers and sort by z-index
   const mapInner = document.getElementById('map-inner');
@@ -329,16 +329,25 @@ async function exportVisibleLayers() {
     });
   }
 
-  // Add map to first page
+  // Add map to first page - centered with proper aspect ratio
   const imgData = canvas.toDataURL('image/png');
-  const pdfWidth = pdf.internal.pageSize.getWidth() - 20; // 10mm margins on each side
-  const pdfHeight = (height / width) * pdfWidth;
+  const pageWidth = pdf.internal.pageSize.getWidth();
+  const pageHeight = pdf.internal.pageSize.getHeight();
   
-  // Center the map on the page
-  const xPos = (pdf.internal.pageSize.getWidth() - pdfWidth) / 2;
-  const yPos = 10; // 10mm from top
+  // Calculate map dimensions with margins
+  const maxMapWidth = pageWidth - 40; // 20mm left + 20mm right margin
+  const maxMapHeight = pageHeight - 60; // 30mm top + 30mm bottom margin
   
-  pdf.addImage(imgData, 'PNG', xPos, yPos, pdfWidth, pdfHeight);
+  // Calculate scale to fit within max dimensions while maintaining aspect ratio
+  const scale = Math.min(maxMapWidth / width, maxMapHeight / height);
+  const mapWidth = width * scale;
+  const mapHeight = height * scale;
+  
+  // Center the map on the page (both horizontally and vertically)
+  const xPos = (pageWidth - mapWidth) / 2;
+  const yPos = (pageHeight - mapHeight) / 2;
+  
+  pdf.addImage(imgData, 'PNG', xPos, yPos, mapWidth, mapHeight);
   
   // Add page for legend
   pdf.addPage();
@@ -347,58 +356,113 @@ async function exportVisibleLayers() {
   pdf.setFontSize(16);
   pdf.text('Legende', 15, 20);
   
-  // Add legend content
+  // Two-column legend setup
+  const columnWidth = (pageWidth - 45) / 2; // 15mm left margin + 15mm gap + 15mm right margin
+  const leftColumnX = 15;
+  const rightColumnX = leftColumnX + columnWidth + 15;
+  
   let yPosition = 35;
-  const lineHeight = 8;
-  const symbolWidth = 6;
+  const lineHeight = 7;
+  const symbolWidth = 5;
+  let currentColumn = 'left';
   
-  pdf.setFontSize(10);
-  
+  pdf.setFontSize(9);
+
   layerLegends.forEach(group => {
     const activeLayers = group.layers.filter(layer => 
       document.getElementById(layer.id).style.display === 'block'
     );
     
     if (activeLayers.length > 0) {
+      const currentX = currentColumn === 'left' ? leftColumnX : rightColumnX;
+      
       // Group title
       pdf.setFont(undefined, 'bold');
-      pdf.text(group.title, 15, yPosition);
-      yPosition += lineHeight * 1.5;
+      pdf.text(group.title, currentX, yPosition);
+      yPosition += lineHeight * 1.2;
       
       activeLayers.forEach(layer => {
         layer.items.forEach(item => {
+          const currentX = currentColumn === 'left' ? leftColumnX : rightColumnX;
+          
           if (item.subtitle) {
             pdf.setFont(undefined, 'bold');
-            pdf.text(item.label, 20, yPosition);
+            pdf.text(item.label, currentX + 5, yPosition);
             yPosition += lineHeight;
+            
+            // Check if we need to switch columns or add new page
+            if (yPosition > pageHeight - 20) {
+              if (currentColumn === 'left') {
+                currentColumn = 'right';
+                yPosition = 35;
+              } else {
+                pdf.addPage();
+                currentColumn = 'left';
+                yPosition = 20;
+                pdf.setFontSize(16);
+                pdf.text('Legende (Fortsetzung)', 15, yPosition);
+                yPosition = 35;
+                pdf.setFontSize(9);
+              }
+            }
             return;
           }
           
           // Draw symbol
           if (item.color && !item.line && !item.gradient) {
             pdf.setFillColor(item.color);
-            pdf.rect(20, yPosition - 4, symbolWidth, symbolWidth, 'F');
+            pdf.rect(currentX + 5, yPosition - 3, symbolWidth, symbolWidth, 'F');
           } else if (item.line) {
             pdf.setDrawColor(item.color);
             pdf.setLineWidth(1);
-            pdf.line(20, yPosition - 2, 20 + symbolWidth, yPosition - 2);
+            pdf.line(currentX + 5, yPosition - 1, currentX + 5 + symbolWidth, yPosition - 1);
           } else if (item.gradient) {
             // For gradients, use a simple colored rectangle
             const baseColor = item.gradient.includes('#1976d2') ? '#1976d2' : 
                              item.gradient.includes('#8b0000') ? '#8b0000' : '#0a3211';
             pdf.setFillColor(baseColor);
-            pdf.rect(20, yPosition - 4, symbolWidth, symbolWidth, 'F');
+            pdf.rect(currentX + 5, yPosition - 3, symbolWidth, symbolWidth, 'F');
           }
           
           // Item label
           pdf.setFont(undefined, 'normal');
-          pdf.text(item.label, 30, yPosition);
-          yPosition += lineHeight;
           
-          // Add new page if we're running out of space
-          if (yPosition > pdf.internal.pageSize.getHeight() - 20) {
-            pdf.addPage();
-            yPosition = 20;
+          // Split long labels to fit column width
+          const maxTextWidth = columnWidth - 15; // 5mm symbol + 5mm margin + 5mm padding
+          const words = item.label.split(' ');
+          let line = '';
+          let textY = yPosition;
+          
+          for (let i = 0; i < words.length; i++) {
+            const testLine = line + words[i] + ' ';
+            const testWidth = pdf.getTextWidth(testLine);
+            
+            if (testWidth > maxTextWidth && i > 0) {
+              pdf.text(line, currentX + 12, textY);
+              line = words[i] + ' ';
+              textY += lineHeight;
+            } else {
+              line = testLine;
+            }
+          }
+          pdf.text(line, currentX + 12, textY);
+          
+          yPosition = textY + lineHeight;
+          
+          // Check if we need to switch columns or add new page
+          if (yPosition > pageHeight - 20) {
+            if (currentColumn === 'left') {
+              currentColumn = 'right';
+              yPosition = 35;
+            } else {
+              pdf.addPage();
+              currentColumn = 'left';
+              yPosition = 20;
+              pdf.setFontSize(16);
+              pdf.text('Legende (Fortsetzung)', 15, yPosition);
+              yPosition = 35;
+              pdf.setFontSize(9);
+            }
           }
         });
       });
@@ -539,3 +603,4 @@ updateLegend();
 </script>
 </body>
 </html>
+
