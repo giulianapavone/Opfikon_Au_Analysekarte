@@ -101,28 +101,22 @@
   #zoom-controls button:hover {
     background-color: #bbb;
   }
-
-  #export-container {
-    margin-top: 4px;
-    margin-bottom: 4px;
-  }
   
   #export-button {
     width: 100%;
-    padding: 4px;
-    font-size: 13px;
+    padding: 2px 4px;
+    margin-bottom: 2px;
+    font-size: 11px;
+    cursor: pointer;
     border: none;
     border-radius: 4px;
-    background-color: #4caf50;
-    color: white;
-    cursor: pointer;
+    background-color: #ccc;
     transition: background-color 0.2s;
   }
   
   #export-button:hover {
     background-color: #45a049;
   }
-
 
   /* Layer toggle buttons */
   #buttons {
@@ -244,7 +238,7 @@
   </div>
 
  <div id="export-container">
-   <button id="export-button" onclick="exportVisibleLayers()">Exportieren (sichtbare Layer)</button>
+   <button id="export-button" onclick="exportVisibleLayers()">Exportieren</button>
  </div>
 
   <div id="buttons">
@@ -512,6 +506,9 @@ async function exportVisibleLayers() {
   canvas.height = height;
   const ctx = canvas.getContext('2d');
 
+  ctx.fillStyle = 'white';
+  ctx.fillRect(0, 0, width, height);
+
   for (const layer of layers) {
     await new Promise((resolve, reject) => {
       const img = new Image();
@@ -530,7 +527,7 @@ async function exportVisibleLayers() {
   link.href = canvas.toDataURL('image/png');
   link.click();
 }
- 
+
 window.addEventListener('resize', adjustLegendPadding);
 </script>
 
