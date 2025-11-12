@@ -78,6 +78,22 @@
     position: relative;
   }
 
+   #export-button {
+    display: block;
+    width: 100%;
+    padding: 2px 4px;
+    margin-bottom: 2px;
+    border: none;
+    border-radius: 4px;
+    background-color: #ccc;
+    cursor: pointer;
+    font-size: 14px;
+  }
+  
+  #export-button:hover {
+    background-color: #45a049;
+  }
+
   /* Zoom buttons */
   #zoom-controls {
     display: grid;
@@ -100,22 +116,6 @@
 
   #zoom-controls button:hover {
     background-color: #bbb;
-  }
-  
-  #export-button {
-    width: 100%;
-    padding: 2px 4px;
-    margin-bottom: 2px;
-    font-size: 14px;
-    cursor: pointer;
-    border: none;
-    border-radius: 4px;
-    background-color: #ccc;
-    transition: background-color 0.2s;
-  }
-  
-  #export-button:hover {
-    background-color: #45a049;
   }
 
   /* Layer toggle buttons */
@@ -542,4 +542,5 @@ window.addEventListener('resize', adjustLegendPadding);
 
 </body>
 </html>
+
 
