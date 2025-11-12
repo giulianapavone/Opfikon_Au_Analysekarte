@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Opfikon Au, Analysekarte1</title>
+<title>Opfikon Au, Analysekarte</title>
 <style>
   * {
     margin: 0;
@@ -161,12 +161,10 @@
   #source-tab {
    position: absolute;
    bottom: 0;
-   left: 0;
-   right: 0;
    text-align: center;
    font-size: 11px;
    color: #555;
-   background-color: rgba(255, 255, 255, 0.8);
+   background-color: rgba(255, 255, 255, 0.2);
    backdrop-filter: blur(2px);
    display: flex;
    flex-direction: column;
@@ -369,6 +367,12 @@ const layerLegends = [
 ];
 
 /* Legende updaten */
+/* Platz für Quelle unten */
+function adjustLegendPadding() {
+  const source = document.getElementById('source-tab');
+  const legend = document.getElementById('legend-container');
+  legend.style.paddingBottom = source.offsetHeight + 'px';
+}
 function updateLegend() {
   const legendList = document.getElementById('legend-list');
   const legendTitle = document.getElementById('legend-title');
@@ -421,6 +425,7 @@ function updateLegend() {
   });
 
   legendTitle.style.display = legendList.children.length > 0 ? 'block' : 'none';
+  adjustLegendPadding();
 }
 
 /* Init */
@@ -431,10 +436,3 @@ updateLegend();
 </script>
 </body>
 </html>
-
-
-
-
-
-
-
