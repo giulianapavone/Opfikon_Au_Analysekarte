@@ -3,8 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Opfikon Au, Analysekarte1</title>
-<script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
+<title>Opfikon Au, Analysekarte</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/dom-to-image/2.6.0/dom-to-image.min.js"></script>
 <style>
   * {
     margin: 0;
@@ -288,7 +288,7 @@ function toggleLayer(id, button) {
 
 /* Export */
 async function exportVisibleLayers() {
-  // Export map layers
+  // Export map layers (unchanged)
   const mapInner = document.getElementById('map-inner');
   const allLayers = Array.from(mapInner.querySelectorAll('.layer'));
   const visibleLayers = allLayers.filter(l => l.style.display === 'block');
@@ -318,50 +318,59 @@ async function exportVisibleLayers() {
 
   // Create map download
   const mapLink = document.createElement('a');
-  mapLink.download = 'Analysekarte_Export.png';
+  mapLink.download = 'Analysekarte.png';
   mapLink.href = canvas.toDataURL('image/png');
   mapLink.click();
 
-  // Export legend using html2canvas for proper rendering
+  // Export legend using dom-to-image for better quality
   const legendContainer = document.getElementById('legend-container');
   
-  // Create a temporary container for better export
-  const tempLegend = document.createElement('div');
-  tempLegend.style.position = 'absolute';
-  tempLegend.style.left = '-9999px';
+  // Create a temporary scaled-up version
+  const tempLegend = legendContainer.cloneNode(true);
+  tempLegend.style.position = 'fixed';
+  tempLegend.style.left = '0';
   tempLegend.style.top = '0';
   tempLegend.style.background = 'white';
-  tempLegend.style.padding = '20px';
-  tempLegend.style.border = '1px solid #ccc';
-  tempLegend.style.borderRadius = '8px';
-  tempLegend.style.boxShadow = '0 2px 10px rgba(0,0,0,0.1)';
+  tempLegend.style.padding = '80px';
+  tempLegend.style.border = '2px solid #ccc';
+  tempLegend.style.zIndex = '9999';
+  tempLegend.style.width = '600px';
+  tempLegend.style.fontSize = '32px';
   
-  // Clone the legend content
-  const legendContent = legendContainer.cloneNode(true);
-  tempLegend.appendChild(legendContent);
+  // Scale up child elements
+  const allElements = tempLegend.querySelectorAll('*');
+  allElements.forEach(el => {
+    const style = window.getComputedStyle(el);
+    if (style.fontSize) {
+      const currentSize = parseFloat(style.fontSize);
+      el.style.fontSize = (currentSize * 2) + 'px';
+    }
+    if (el.tagName === 'SPAN' || el.tagName === 'IMG') {
+      el.style.width = '60px';
+      el.style.height = '60px';
+    }
+  });
+  
   document.body.appendChild(tempLegend);
-  
-  try {
-    // Use html2canvas library for proper rendering
-    const legendCanvas = await html2canvas(tempLegend, {
-      backgroundColor: '#ffffff',
-      scale: 6, // Higher resolution
-      useCORS: true,
-      allowTaint: true
-    });
-    
-    // Create legend download
+
+  // Use dom-to-image for higher quality
+  domtoimage.toPng(tempLegend, {
+    width: tempLegend.scrollWidth,
+    height: tempLegend.scrollHeight,
+    quality: 1,
+    bgcolor: '#ffffff'
+  }).then(function(dataUrl) {
     const legendLink = document.createElement('a');
     legendLink.download = 'Analysekarte_Legende.png';
-    legendLink.href = legendCanvas.toDataURL('image/png');
+    legendLink.href = dataUrl;
     legendLink.click();
-  } catch (error) {
-    console.error('Error exporting legend:', error);
-    alert('Fehler beim Export der Legende. Bitte stellen Sie sicher, dass html2canvas verfügbar ist.');
-  } finally {
+    
     // Clean up
     document.body.removeChild(tempLegend);
-  }
+  }).catch(function(error) {
+    console.error('Legend export failed:', error);
+    document.body.removeChild(tempLegend);
+  });
 }
 
 /* Layer Legendeninfos */
@@ -492,3 +501,4 @@ updateLegend();
 </script>
 </body>
 </html>
+
