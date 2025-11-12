@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Opfikon Au, Analysekarte</title>
+<title>Opfikon Au, Analysekarte1</title>
 <style>
   * {
     margin: 0;
@@ -277,7 +277,6 @@ async function exportVisibleLayers() {
   const allLayers = Array.from(mapInner.querySelectorAll('.layer'));
   const visibleLayers = allLayers.filter(l => l.style.display === 'block');
   
-  // Remove the alert since there are always visible layers
   visibleLayers.sort((a, b) => (parseInt(getComputedStyle(a).zIndex) || 0) - (parseInt(getComputedStyle(b).zIndex) || 0));
 
   const ref = visibleLayers[0];
@@ -428,3 +427,4 @@ updateLegend();
 </script>
 </body>
 </html>
+
