@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Opfikon Au, Analysekarte</title>
+<title>Opfikon Au, Analysekarte1</title>
 <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
 <style>
   * {
@@ -345,7 +345,7 @@ async function exportVisibleLayers() {
     // Use html2canvas library for proper rendering
     const legendCanvas = await html2canvas(tempLegend, {
       backgroundColor: '#ffffff',
-      scale: 3, // Higher resolution
+      scale: 6, // Higher resolution
       useCORS: true,
       allowTaint: true
     });
@@ -492,18 +492,3 @@ updateLegend();
 </script>
 </body>
 </html>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
