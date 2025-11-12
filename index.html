@@ -78,7 +78,8 @@
     position: relative;
   }
 
-   #export-button {
+  /* Einheitliches Button-Design */
+  button {
     display: block;
     width: 100%;
     padding: 2px 4px;
@@ -88,13 +89,19 @@
     background-color: #ccc;
     cursor: pointer;
     font-size: 14px;
-  }
-  
-  #export-button:hover {
-    background-color: #45a049;
+    transition: background-color 0.2s;
   }
 
-  /* Zoom buttons */
+  button:hover {
+    background-color: #bbb;
+  }
+
+  button.active {
+    background-color: #4CAF50;
+    color: white;
+  }
+
+  /* Zoom controls */
   #zoom-controls {
     display: grid;
     grid-template-columns: repeat(5, 1fr);
@@ -103,55 +110,12 @@
   }
 
   #zoom-controls button {
-    width: 100%;
-    padding: 2px 4px;
-    margin-bottom: 2px;
     font-size: 11px;
-    cursor: pointer;
-    border: none;
-    border-radius: 4px;
-    background-color: #ccc;
-    transition: background-color 0.2s;
   }
 
-  #zoom-controls button:hover {
-    background-color: #bbb;
-  }
-
-  /* Layer toggle buttons */
+  /* Layer buttons */
   #buttons {
-    top: 0;
-  }
-
-  #buttons button {
-    display: block;
-    width: 100%;
-    padding: 2px 4px;
-    margin-bottom: 2px;
-    border: none;
-    border-radius: 4px;
-    background-color: #ccc;
-    cursor: pointer;
-    font-size: 14px;
-  }
-
-  #buttons button.active {
-    background-color: #4CAF50;
-    color: white;
-  }
-
-  /* Source tab at bottom of sidebar */
-  #source-tab {
-    position: fixed;
-    bottom: 0;
-    right: 0;
-    width: 240px;
-    text-align: center;
-    font-size: 11px;
-    color: #777;
-    padding: 4px;
-    background-color: rgba(255,255,255,0.5);
-    backdrop-filter: blur(2px);
+    margin-top: 4px;
   }
 
   /* Legend */
@@ -181,32 +145,52 @@
     font-size: 14px;
   }
 
- /* Einheitlicher Stil fuer alle Legendensymbole */
- #legend-list li span {
-   display: inline-block;
-   width: 20px;
-   height: 20px;
-   margin-right: 5px;
-   vertical-align: middle;
-   background-size: contain;
-   background-repeat: no-repeat;
-   background-position: center;
- }
+  #legend-list li span {
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    margin-right: 5px;
+    vertical-align: middle;
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+  }
 
- #legend-list li img {
-  display: inline-block;
-  width: 20px;
-  height: 20px;
-  object-fit: contain;
-  margin-right: 5px;
-  vertical-align: middle;
-}
- 
+  #legend-list li img {
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    object-fit: contain;
+    margin-right: 5px;
+    vertical-align: middle;
+  }
+
+  /* Quellen & Export unten */
+  #source-tab {
+    position: fixed;
+    bottom: 0;
+    right: 0;
+    width: 240px;
+    text-align: center;
+    font-size: 11px;
+    color: #555;
+    padding: 6px;
+    background-color: rgba(255,255,255,0.8);
+    backdrop-filter: blur(2px);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  #source-tab button {
+    width: 90%;
+    margin-top: 4px;
+  }
 </style>
 </head>
 <body>
 
-<!-- Left: map -->
+<!-- Map -->
 <div id="main-column">
   <div id="map-container">
     <div id="map-inner">
@@ -226,13 +210,9 @@
   </div>
 </div>
 
-<!-- Right: sidebar -->
+<!-- Sidebar -->
 <div id="sidebar">
 
-  <div id="export-container">
-    <button id="export-button" onclick="exportVisibleLayers()">Exportieren</button>
-  </div>
- 
   <div id="zoom-controls">
     <button onclick="zoomMap(-10)">-10%</button>
     <button onclick="zoomMap(-5)">-5%</button>
@@ -260,9 +240,10 @@
   </div>
 </div>
 
-<!-- fixed Quelle tab at bottom -->
+<!-- Quellen & Export -->
 <div id="source-tab">
-  Quellen: GIS-ZH, Swisstopo & Google Maps 2025
+  <div>Quellen: GIS-ZH, Swisstopo & Google Maps 2025</div>
+  <button onclick="exportVisibleLayers()">Exportieren</button>
 </div>
 
 <script>
@@ -274,8 +255,8 @@ function updateZoomDisplay() {
 
 function zoomMap(change) {
   zoom += change;
-  if(zoom < 50) zoom = 50;
-  if(zoom > 200) zoom = 200;
+  if (zoom < 50) zoom = 50;
+  if (zoom > 200) zoom = 200;
   document.getElementById('map-inner').style.transform = `scale(${zoom/100})`;
   updateZoomDisplay();
 }
@@ -288,7 +269,7 @@ function zoomDefault() {
 
 function toggleLayer(id, button) {
   const el = document.getElementById(id);
-  if(el.style.display === 'block') {
+  if (el.style.display === 'block') {
     el.style.display = 'none';
     button.classList.remove('active');
   } else {
@@ -298,249 +279,55 @@ function toggleLayer(id, button) {
   updateLegend();
 }
 
-// Layer und Legendeninfos
-const layerLegends = [
-  {
-    title: "Bauzonen",
-    layers: [
-      { id: "Analysekarte-Bauzonen", items:[
-        {label:"WG3", color:"#ffd4d0"},
-        {label:"W4", color:"#ffded0"},
-        {label:"W3", color:"#ffefd0"},
-        {label:"W2d", color:"#fff7d0"}
-      ]}
-    ]
-  },
-  {
-    title: "Baujahr",
-    layers: [
-      { id:"Analysekarte-Gebaeudealter", items:[
-        {label:"1926-1950", color:"#ab3087"},
-        {label:"1951-1960", color:"#ec5689"},
-        {label:"1961-1970", color:"#f4737e"},
-        {label:"1971-1980", color:"#f5926e"},
-        {label:"1981-1990", color:"#edb066"},
-        {label:"1991-2000", color:"#e0cb6e"},
-        {label:"2001-2010", color:"#c8e17c"},
-        {label:"2011-heute", color:"#88e17c"}
-      ]}
-    ]
-  },
-  {
-   title: "Grundeigentümer",
-   layers: [
-     { id: "Analysekarte-Eigentuemer", items: [
-       { label: "Stockwerkeigentum", color: "#999999" },
-       
-       // 👇 Zwischenüberschrift:
-       { label: "Ein Farbton pro Partie:", subtitle: true },
-       
-       { label: "Genossenschaften", gradient: "linear-gradient(to right, #64b5f6, #1976d2)" },
-       { label: "Aktiengesellschaften", gradient: "linear-gradient(to right, #ffc1c1, #8b0000)" },
-       { label: "Private Eigentümer", gradient: "linear-gradient(to right, #d5f5e3, #0a3211)" }
-     ]}
-   ]
-  },
-  {
-    title: "Verkehr",
-    layers: [
-      { id:"Analysekarte-Fusswege", items:[
-        {label:"Fussgängerzugängliche Wege", line:true, color:"#ee000b"},
-        {label:"fehlende Fusswege", stripes:true, color:"#ee000b"}
-      ]},
-      { id:"Analysekarte-Fussgaengerstreifen", items:[
-        {label:"Fussgängerstreifen", icon:"Fussgaengerstreifensymbol.png"}
-      ]},
-      { id:"Analysekarte-Velowege", items:[
-        {label:"Veloweg", line:true, color:"#000aee"}
-      ]},
-      { id:"Analysekarte-Busstationen", items:[
-        {label:"Bushaltestellen", icon:"Bushaltestellensymbol.png"}
-      ]},
-      { id:"Analysekarte-Unfaelle", items:[
-        {label:"Unfälle von 2011 bis 2025", icon:"Unfaellesymbol.png"}
-      ]}
-    ]
-  },
-  {
-    title:"Durchschnittlicher Strassenlärm von 06:00 bis 22:00",
-    layers:[
-      {id:"Analysekarte-Strassenlaerm", items:[
-        {label:">= 75 dB(A)", color:"#787fab"},
-        {label:"70-74.9 dB(A)", color:"#bfadcc"},
-        {label:"65-69.9 dB(A)", color:"#aa6974"},
-        {label:"60-64.9 dB(A)", color:"#eb7878"},
-        {label:"55-59.9 dB(A)", color:"#ee966e"},
-        {label:"50-54.9 dB(A)", color:"#f9cc85"},
-        {label:"45-49.9 dB(A)", color:"#eee86e"},
-        {label:"40-44.9 dB(A)", color:"#677b64"}
-      ]}
-    ]
-  },
-  {
-    title:"Fluglärm",
-    layers:[
-      {id:"Analysekarte-Fluglaerm", items:[
-        {label:"65 dB(A)", line:true, color:"#007d1d"}
-      ]}
-    ]
-  }
-];
-
-function updateLegend() {
-  const legendList = document.getElementById('legend-list');
-  const legendTitle = document.getElementById('legend-title');
-  legendList.innerHTML = ''; // alte Einträge löschen
-
-  layerLegends.forEach(group => {
-    // Nur aktive Layer anzeigen
-    const activeLayers = group.layers.filter(layer =>
-      document.getElementById(layer.id).style.display === 'block'
-    );
-
-    if (activeLayers.length > 0) {
-      // Gruppentitel (z. B. "Grundeigentümer")
-      const liGroup = document.createElement('li');
-      liGroup.innerHTML = `<strong>${group.title}</strong>`;
-      liGroup.style.marginTop = '6px';
-      liGroup.style.fontSize = '15px';
-      legendList.appendChild(liGroup);
-
-      activeLayers.forEach(layer => {
-        layer.items.forEach(item => {
-
-          // 🧩 Untertitel einfügen
-          if (item.subtitle) {
-            const liSubtitle = document.createElement('li');
-            liSubtitle.textContent = item.label;
-            liSubtitle.style.fontWeight = 'bold';
-            liSubtitle.style.fontSize = '13px';
-            legendList.appendChild(liSubtitle);
-            return; // nächsten Item überspringen
-          }
-
-          // ⚙️ Normaler Legendeneintrag
-          const li = document.createElement('li');
-
-          const symbol = document.createElement('span');
-          symbol.style.width = '20px';
-          symbol.style.height = '20px';
-          symbol.style.display = 'inline-block';
-          symbol.style.marginRight = '5px';
-          symbol.style.verticalAlign = 'middle';
-          symbol.style.backgroundSize = 'contain';
-          symbol.style.backgroundRepeat = 'no-repeat';
-          symbol.style.backgroundPosition = 'center';
-          symbol.style.backgroundColor = '';
-          symbol.style.backgroundImage = '';
-
-          // 🖼️ Symbol-Typ bestimmen
-          if (item.icon) {
-            // Bildsymbol (PNG, SVG etc.)
-            symbol.style.backgroundImage = `url('${item.icon}')`;
-          } else if (item.line) {
-            // Linien-Symbol
-            symbol.style.backgroundImage = `linear-gradient(to right, ${item.color} 100%, transparent 0)`;
-            symbol.style.backgroundSize = '100% 4px';
-            symbol.style.backgroundPosition = 'center';
-            symbol.style.backgroundRepeat = 'no-repeat';
-          } else if (item.stripes) {
-            // Schraffierung
-            symbol.style.backgroundImage = `repeating-linear-gradient(
-              to right,
-              ${item.color} 0 2px,
-              white 2px 4px
-            )`;
-          } else if (item.gradient) {
-            // Verlauf (z. B. für Eigentümer)
-            symbol.style.backgroundImage = item.gradient;
-          } else if (item.color) {
-            // Einzelfarbe
-            symbol.style.backgroundColor = item.color;
-          }
-
-          // Text anhängen
-          li.appendChild(symbol);
-          li.appendChild(document.createTextNode(item.label));
-          legendList.appendChild(li);
-        });
-      });
-    }
-  });
-
-  // Titel der Legende nur zeigen, wenn Einträge vorhanden sind
-  legendTitle.style.display = legendList.children.length > 0 ? 'block' : 'none';
-
-  adjustLegendPadding(); // Platz über Quelle-Tab halten
-}
-
-function adjustLegendPadding() {
-  const source = document.getElementById('source-tab');
-  const legend = document.getElementById('legend-container');
-  legend.style.paddingBottom = source.offsetHeight + 'px';
-}
-
 // Initialisierung
 document.getElementById('Analysekarte-Basekarte').style.display='block';
 document.getElementById('Analysekarte-Glatt').style.display='block';
 updateZoomDisplay();
-adjustLegendPadding();
-updateLegend();
 
 async function exportVisibleLayers() {
   const mapInner = document.getElementById('map-inner');
-  // Alle Layer in DOM-Reihenfolge (von unten nach oben)
   const allLayers = Array.from(mapInner.querySelectorAll('.layer'));
-
-  // Nur sichtbare Layer auswählen
-  const visibleLayers = allLayers.filter(layer => layer.style.display === 'block');
+  const visibleLayers = allLayers.filter(l => l.style.display === 'block');
 
   if (visibleLayers.length === 0) {
     alert('Keine sichtbaren Layer zum Exportieren.');
     return;
   }
 
-  // Erste sichtbare als Referenz für Größe
-  const refLayer = visibleLayers[0];
-  const width = refLayer.naturalWidth;
-  const height = refLayer.naturalHeight;
+  // Sortiere nach tatsächlichem z-index (von unten nach oben)
+  visibleLayers.sort((a, b) => {
+    const za = parseInt(getComputedStyle(a).zIndex) || 0;
+    const zb = parseInt(getComputedStyle(b).zIndex) || 0;
+    return za - zb;
+  });
 
-  // Canvas vorbereiten
+  const ref = visibleLayers[0];
+  const width = ref.naturalWidth;
+  const height = ref.naturalHeight;
+
   const canvas = document.createElement('canvas');
   canvas.width = width;
   canvas.height = height;
   const ctx = canvas.getContext('2d');
 
-  // 🟦 Weißer Hintergrund zuerst
   ctx.fillStyle = 'white';
   ctx.fillRect(0, 0, width, height);
 
-  // 🔄 Sichtbare Layer in DOM-Reihenfolge (von unten nach oben) zeichnen
   for (const layer of visibleLayers) {
     await new Promise((resolve, reject) => {
       const img = new Image();
       img.crossOrigin = 'anonymous';
-      img.onload = () => {
-        ctx.drawImage(img, 0, 0, width, height);
-        resolve();
-      };
+      img.onload = () => { ctx.drawImage(img, 0, 0, width, height); resolve(); };
       img.onerror = reject;
       img.src = layer.src;
     });
   }
 
-  // 💾 PNG speichern
   const link = document.createElement('a');
   link.download = 'Analysekarte_Export.png';
   link.href = canvas.toDataURL('image/png');
   link.click();
 }
-
- 
-window.addEventListener('resize', adjustLegendPadding);
 </script>
-
 </body>
 </html>
-
-
