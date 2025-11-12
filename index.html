@@ -287,6 +287,7 @@ function toggleLayer(id, button) {
 
 /* Export */
 async function exportVisibleLayers() {
+  // Export map layers
   const mapInner = document.getElementById('map-inner');
   const allLayers = Array.from(mapInner.querySelectorAll('.layer'));
   const visibleLayers = allLayers.filter(l => l.style.display === 'block');
@@ -314,10 +315,81 @@ async function exportVisibleLayers() {
     });
   }
 
-  const link = document.createElement('a');
-  link.download = 'Analysekarte_Export.png';
-  link.href = canvas.toDataURL('image/png');
-  link.click();
+  // Create map download
+  const mapLink = document.createElement('a');
+  mapLink.download = 'Analysekarte_Export.png';
+  mapLink.href = canvas.toDataURL('image/png');
+  mapLink.click();
+
+  // Export legend
+  const legendContainer = document.getElementById('legend-container');
+  const legendCanvas = document.createElement('canvas');
+  const legendCtx = legendCanvas.getContext('2d');
+  
+  // Set canvas size based on legend content
+  legendCanvas.width = legendContainer.scrollWidth;
+  legendCanvas.height = legendContainer.scrollHeight;
+  
+  // Fill background
+  legendCtx.fillStyle = 'white';
+  legendCtx.fillRect(0, 0, legendCanvas.width, legendCanvas.height);
+  
+  // Draw legend content
+  legendCtx.fillStyle = 'black';
+  legendCtx.font = '14px sans-serif';
+  
+  // Draw legend title if visible
+  const legendTitle = document.getElementById('legend-title');
+  if (legendTitle.style.display !== 'none') {
+    legendCtx.font = 'bold 14px sans-serif';
+    legendCtx.fillText(legendTitle.textContent, 10, 20);
+  }
+  
+  // Draw legend items
+  const legendItems = document.querySelectorAll('#legend-list li');
+  let yPosition = 40;
+  
+  legendItems.forEach(item => {
+    const text = item.textContent;
+    
+    // Check if this is a group title (bold)
+    if (item.querySelector('strong')) {
+      legendCtx.font = 'bold 15px sans-serif';
+      legendCtx.fillText(text, 10, yPosition);
+    } else if (item.style.fontWeight === 'bold') {
+      // Subtitle
+      legendCtx.font = 'bold 13px sans-serif';
+      legendCtx.fillText(text, 10, yPosition);
+    } else {
+      // Regular legend item
+      legendCtx.font = '14px sans-serif';
+      
+      // Draw color box if present
+      const symbol = item.querySelector('span');
+      if (symbol) {
+        const computedStyle = getComputedStyle(symbol);
+        
+        // Draw colored rectangle
+        if (computedStyle.backgroundColor && computedStyle.backgroundColor !== 'rgba(0, 0, 0, 0)') {
+          legendCtx.fillStyle = computedStyle.backgroundColor;
+          legendCtx.fillRect(10, yPosition - 10, 20, 20);
+        }
+        
+        // Reset text color
+        legendCtx.fillStyle = 'black';
+      }
+      
+      legendCtx.fillText(text, 35, yPosition);
+    }
+    
+    yPosition += 20;
+  });
+
+  // Create legend download
+  const legendLink = document.createElement('a');
+  legendLink.download = 'Analysekarte_Legende.png';
+  legendLink.href = legendCanvas.toDataURL('image/png');
+  legendLink.click();
 }
 
 /* Layer Legendeninfos */
@@ -448,6 +520,7 @@ updateLegend();
 </script>
 </body>
 </html>
+
 
 
 
