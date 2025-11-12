@@ -3,8 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-<title>Opfikon Au, Analysekarte</title>
+<title>Opfikon Au, Analysekarte1</title>
+<script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
 <style>
   * {
     margin: 0;
@@ -254,235 +254,6 @@
 <script>
 let zoom = 100;
 
-/* Zoom */
-function updateZoomDisplay() {
-  document.getElementById('zoom-default').textContent = zoom + '%';
-}
-
-function zoomMap(change) {
-  zoom += change;
-  if (zoom < 50) zoom = 50;
-  if (zoom > 200) zoom = 200;
-  document.getElementById('map-inner').style.transform = `scale(${zoom / 100})`;
-  updateZoomDisplay();
-}
-
-function zoomDefault() {
-  zoom = 100;
-  document.getElementById('map-inner').style.transform = 'scale(1)';
-  updateZoomDisplay();
-}
-
-/* Layer toggle */
-function toggleLayer(id, button) {
-  const el = document.getElementById(id);
-  if (el.style.display === 'block') {
-    el.style.display = 'none';
-    button.classList.remove('active');
-  } else {
-    el.style.display = 'block';
-    button.classList.add('active');
-  }
-  updateLegend();
-}
-
-/* Export as PDF with map and legend */
-async function exportVisibleLayers() {
-  const { jsPDF } = window.jspdf;
-  const pdf = new jsPDF('portrait', 'mm', 'a4');
-  
-  // Get visible layers and sort by z-index
-  const mapInner = document.getElementById('map-inner');
-  const allLayers = Array.from(mapInner.querySelectorAll('.layer'));
-  const visibleLayers = allLayers.filter(l => l.style.display === 'block');
-  visibleLayers.sort((a, b) => (parseInt(getComputedStyle(a).zIndex) || 0) - (parseInt(getComputedStyle(b).zIndex) || 0));
-
-  if (visibleLayers.length === 0) {
-    alert('Keine sichtbaren Layer zum Exportieren');
-    return;
-  }
-
-  const ref = visibleLayers[0];
-  const width = ref.naturalWidth;
-  const height = ref.naturalHeight;
-
-  // Create canvas for map
-  const canvas = document.createElement('canvas');
-  canvas.width = width;
-  canvas.height = height;
-  const ctx = canvas.getContext('2d');
-  ctx.fillStyle = 'white';
-  ctx.fillRect(0, 0, width, height);
-
-  // Draw all visible layers to canvas
-  for (const layer of visibleLayers) {
-    await new Promise((resolve, reject) => {
-      const img = new Image();
-      img.crossOrigin = 'anonymous';
-      img.onload = () => { 
-        ctx.drawImage(img, 0, 0, width, height); 
-        resolve(); 
-      };
-      img.onerror = reject;
-      img.src = layer.src;
-    });
-  }
-
-  // Add map to first page - reduced margins
-  const imgData = canvas.toDataURL('image/png');
-  const pageWidth = pdf.internal.pageSize.getWidth();
-  const pageHeight = pdf.internal.pageSize.getHeight();
-  
-  // Reduced margins: 15mm instead of 20mm
-  const maxMapWidth = pageWidth - 30; // 15mm left + 15mm right margin
-  const maxMapHeight = pageHeight - 40; // 20mm top + 20mm bottom margin
-  
-  // Calculate scale to fit within max dimensions while maintaining aspect ratio
-  const scale = Math.min(maxMapWidth / width, maxMapHeight / height);
-  const mapWidth = width * scale;
-  const mapHeight = height * scale;
-  
-  // Center the map on the page
-  const xPos = (pageWidth - mapWidth) / 2;
-  const yPos = (pageHeight - mapHeight) / 2;
-  
-  pdf.addImage(imgData, 'PNG', xPos, yPos, mapWidth, mapHeight);
-  
-  // Add page for legend
-  pdf.addPage();
-  
-  // Add legend title with reduced top margin
-  pdf.setFontSize(16);
-  pdf.text('Legende', 10, 15); // Reduced from 15,20 to 10,15
-  
-  // Two-column legend setup with reduced margins
-  const columnWidth = (pageWidth - 30) / 2; // 10mm left margin + 10mm gap + 10mm right margin
-  const leftColumnX = 10;
-  const rightColumnX = leftColumnX + columnWidth + 10;
-  const bottomMargin = 15; // Reduced from 20mm
-  
-  let yPosition = 25; // Reduced from 35
-  const lineHeight = 6; // Slightly reduced
-  const symbolWidth = 5;
-  let currentColumn = 'left';
-
-  pdf.setFontSize(9);
-
-  // Function to check if we need a new page/column
-  function checkSpaceNeeded(linesNeeded = 1) {
-      const neededHeight = linesNeeded * lineHeight;
-      
-      if (yPosition + neededHeight > pageHeight - bottomMargin) {
-          if (currentColumn === 'left') {
-              currentColumn = 'right';
-              yPosition = 25; // Reset for right column
-              return 'switchColumn';
-          } else {
-              pdf.addPage();
-              currentColumn = 'left';
-              yPosition = 15;
-              pdf.setFontSize(16);
-              pdf.text('Legende (Fortsetzung)', 10, yPosition);
-              yPosition = 25;
-              pdf.setFontSize(9);
-              return 'newPage';
-          }
-      }
-      return 'enoughSpace';
-  }
-
-  layerLegends.forEach(group => {
-      const activeLayers = group.layers.filter(layer => 
-          document.getElementById(layer.id).style.display === 'block'
-      );
-      
-      if (activeLayers.length > 0) {
-          // Check space before starting group
-          checkSpaceNeeded(2); // Group title + at least one item
-          
-          const currentX = currentColumn === 'left' ? leftColumnX : rightColumnX;
-          
-          // Group title
-          pdf.setFont(undefined, 'bold');
-          pdf.text(group.title, currentX, yPosition);
-          yPosition += lineHeight * 1.2;
-          
-          activeLayers.forEach(layer => {
-              layer.items.forEach(item => {
-                  const currentX = currentColumn === 'left' ? leftColumnX : rightColumnX;
-                  
-                  if (item.subtitle) {
-                      checkSpaceNeeded(1);
-                      pdf.setFont(undefined, 'bold');
-                      pdf.text(item.label, currentX + 5, yPosition);
-                      yPosition += lineHeight;
-                      return;
-                  }
-                  
-                  // Check space before regular item
-                  const linesForItem = item.label.length > 30 ? 2 : 1;
-                  const spaceCheck = checkSpaceNeeded(linesForItem);
-                  
-                  // If we switched columns or pages, update currentX
-                  const actualX = currentColumn === 'left' ? leftColumnX : rightColumnX;
-                  
-                  // Handle icons - convert to base64 and add to PDF
-                  if (item.icon) {
-                      try {
-                          // Try to load and add the icon image
-                          const iconImg = new Image();
-                          iconImg.crossOrigin = 'anonymous';
-                          iconImg.src = item.icon;
-                          
-                          // For now, use a placeholder rectangle since we can't easily async load here
-                          pdf.setFillColor(100, 100, 100); // Gray placeholder
-                          pdf.rect(actualX + 5, yPosition - 3, symbolWidth, symbolWidth, 'F');
-                          
-                          // Add (Icon) text to indicate it's an icon
-                          pdf.setFont(undefined, 'normal');
-                          pdf.text(item.label + ' (Icon)', actualX + 12, yPosition);
-                      } catch (e) {
-                          // Fallback: colored rectangle
-                          pdf.setFillColor(100, 100, 100);
-                          pdf.rect(actualX + 5, yPosition - 3, symbolWidth, symbolWidth, 'F');
-                          pdf.setFont(undefined, 'normal');
-                          pdf.text(item.label, actualX + 12, yPosition);
-                      }
-                  } else if (item.color && !item.line && !item.gradient) {
-                      pdf.setFillColor(item.color);
-                      pdf.rect(actualX + 5, yPosition - 3, symbolWidth, symbolWidth, 'F');
-                      pdf.setFont(undefined, 'normal');
-                      pdf.text(item.label, actualX + 12, yPosition);
-                  } else if (item.line) {
-                      pdf.setDrawColor(item.color);
-                      pdf.setLineWidth(1);
-                      pdf.line(actualX + 5, yPosition - 1, actualX + 5 + symbolWidth, yPosition - 1);
-                      pdf.setFont(undefined, 'normal');
-                      pdf.text(item.label, actualX + 12, yPosition);
-                  } else if (item.gradient) {
-                      const baseColor = item.gradient.includes('#1976d2') ? '#1976d2' : 
-                                      item.gradient.includes('#8b0000') ? '#8b0000' : '#0a3211';
-                      pdf.setFillColor(baseColor);
-                      pdf.rect(actualX + 5, yPosition - 3, symbolWidth, symbolWidth, 'F');
-                      pdf.setFont(undefined, 'normal');
-                      pdf.text(item.label, actualX + 12, yPosition);
-                  } else {
-                      pdf.setFont(undefined, 'normal');
-                      pdf.text(item.label, actualX + 12, yPosition);
-                  }
-                  
-                  yPosition += lineHeight;
-              });
-          });
-          
-          yPosition += lineHeight; // Extra space between groups
-      }
-  });
-
-  // Save the PDF
-  pdf.save('Analysekarte_Export.pdf');
-}
-
 /* Layer Legendeninfos */
 const layerLegends = [
   { title: "Bauzonen", layers: [{ id: "Analysekarte-Bauzonen", items: [
@@ -541,43 +312,74 @@ const layerLegends = [
   ]}]}
 ];
 
-/* Legende updaten */
-/* Platz für Quelle unten */
-function adjustLegendPadding() {
-  const source = document.getElementById('source-tab');
-  const legend = document.getElementById('legend-container');
-  legend.style.paddingBottom = source.offsetHeight + 'px';
-}
-function updateLegend() {
-  const legendList = document.getElementById('legend-list');
-  const legendTitle = document.getElementById('legend-title');
-  legendList.innerHTML = '';
-
-  layerLegends.forEach(group => {
-    const activeLayers = group.layers.filter(layer => document.getElementById(layer.id).style.display === 'block');
-    if (activeLayers.length > 0) {
-      const liGroup = document.createElement('li');
-      liGroup.innerHTML = `<strong>${group.title}</strong>`;
-      liGroup.style.marginTop = '6px';
-      liGroup.style.fontSize = '15px';
-      legendList.appendChild(liGroup);
-
-      activeLayers.forEach(layer => {
+/* Universal legend builder - can be used for display AND export */
+function buildLegendContent(container, forExport = false) {
+  container.innerHTML = '';
+  
+  const activeGroups = layerLegends.filter(group => 
+    group.layers.some(layer => document.getElementById(layer.id).style.display === 'block')
+  );
+  
+  if (activeGroups.length === 0) return;
+  
+  if (forExport) {
+    // For export: larger sizes, better spacing
+    const title = document.createElement('div');
+    title.textContent = 'Legende';
+    title.style.fontWeight = 'bold';
+    title.style.fontSize = '24px';
+    title.style.marginBottom = '20px';
+    container.appendChild(title);
+  } else {
+    // For display: use existing styling
+    const title = document.getElementById('legend-title');
+    title.style.display = 'block';
+  }
+  
+  const list = document.createElement('ul');
+  list.style.listStyle = 'none';
+  list.style.padding = '0';
+  list.style.margin = '0';
+  
+  activeGroups.forEach(group => {
+    const groupTitle = document.createElement('li');
+    groupTitle.innerHTML = `<strong>${group.title}</strong>`;
+    groupTitle.style.marginTop = forExport ? '15px' : '6px';
+    groupTitle.style.fontSize = forExport ? '20px' : '15px';
+    groupTitle.style.marginBottom = '10px';
+    list.appendChild(groupTitle);
+    
+    group.layers.forEach(layer => {
+      if (document.getElementById(layer.id).style.display === 'block') {
         layer.items.forEach(item => {
           if (item.subtitle) {
-            const liSub = document.createElement('li');
-            liSub.textContent = item.label;
-            liSub.style.fontWeight = 'bold';
-            liSub.style.fontSize = '13px';
-            legendList.appendChild(liSub);
+            const subtitle = document.createElement('li');
+            subtitle.textContent = item.label;
+            subtitle.style.fontWeight = 'bold';
+            subtitle.style.fontSize = forExport ? '16px' : '13px';
+            subtitle.style.margin = '5px 0';
+            list.appendChild(subtitle);
             return;
           }
-
+          
           const li = document.createElement('li');
+          li.style.margin = forExport ? '8px 0' : '2px 0';
+          li.style.display = 'flex';
+          li.style.alignItems = 'center';
+          li.style.fontSize = forExport ? '18px' : '14px';
+          
           const symbol = document.createElement('span');
-
+          symbol.style.display = 'inline-block';
+          symbol.style.width = forExport ? '30px' : '20px';
+          symbol.style.height = forExport ? '30px' : '20px';
+          symbol.style.marginRight = forExport ? '10px' : '5px';
+          symbol.style.flexShrink = '0';
+          
           if (item.icon) {
             symbol.style.backgroundImage = `url('${item.icon}')`;
+            symbol.style.backgroundSize = 'contain';
+            symbol.style.backgroundRepeat = 'no-repeat';
+            symbol.style.backgroundPosition = 'center';
           } else if (item.line) {
             symbol.style.backgroundImage = `linear-gradient(to right, ${item.color} 100%, transparent 0)`;
             symbol.style.backgroundSize = '100% 4px';
@@ -590,17 +392,146 @@ function updateLegend() {
           } else if (item.color) {
             symbol.style.backgroundColor = item.color;
           }
-
+          
           li.appendChild(symbol);
           li.appendChild(document.createTextNode(item.label));
-          legendList.appendChild(li);
+          list.appendChild(li);
         });
-      });
-    }
+      }
+    });
   });
+  
+  container.appendChild(list);
+}
 
-  legendTitle.style.display = legendList.children.length > 0 ? 'block' : 'none';
+/* Universal map layer builder - can be used for display AND export */
+async function buildMapLayers(canvas, forExport = false) {
+  const mapInner = document.getElementById('map-inner');
+  const allLayers = Array.from(mapInner.querySelectorAll('.layer'));
+  const visibleLayers = allLayers.filter(l => l.style.display === 'block');
+  
+  visibleLayers.sort((a, b) => (parseInt(getComputedStyle(a).zIndex) || 0) - (parseInt(getComputedStyle(b).zIndex) || 0));
+
+  const ref = visibleLayers[0];
+  const width = ref.naturalWidth;
+  const height = ref.naturalHeight;
+
+  if (forExport) {
+    canvas.width = width;
+    canvas.height = height;
+  }
+  
+  const ctx = canvas.getContext('2d');
+  ctx.fillStyle = 'white';
+  ctx.fillRect(0, 0, width, height);
+
+  for (const layer of visibleLayers) {
+    await new Promise((resolve, reject) => {
+      const img = new Image();
+      img.crossOrigin = 'anonymous';
+      img.onload = () => { 
+        ctx.drawImage(img, 0, 0, width, height); 
+        resolve(); 
+      };
+      img.onerror = reject;
+      img.src = layer.src;
+    });
+  }
+  
+  return canvas;
+}
+
+/* Export legend - uses the unified buildLegendContent function */
+async function exportLegendToCanvas() {
+  const tempContainer = document.createElement('div');
+  tempContainer.style.position = 'fixed';
+  tempContainer.style.left = '0';
+  tempContainer.style.top = '0';
+  tempContainer.style.background = 'white';
+  tempContainer.style.padding = '320px';
+  tempContainer.style.border = '8px solid #ccc';
+  tempContainer.style.zIndex = '9999';
+  tempContainer.style.width = '2400px';
+  
+  document.body.appendChild(tempContainer);
+  
+  buildLegendContent(tempContainer, true);
+  
+  const legendCanvas = await html2canvas(tempContainer, {
+    scale: 8,
+    backgroundColor: '#ffffff',
+    useCORS: true
+  });
+  
+  document.body.removeChild(tempContainer);
+  return legendCanvas;
+}
+
+/* Zoom */
+function updateZoomDisplay() {
+  document.getElementById('zoom-default').textContent = zoom + '%';
+}
+
+function zoomMap(change) {
+  zoom += change;
+  if (zoom < 50) zoom = 50;
+  if (zoom > 200) zoom = 200;
+  document.getElementById('map-inner').style.transform = `scale(${zoom / 100})`;
+  updateZoomDisplay();
+}
+
+function zoomDefault() {
+  zoom = 100;
+  document.getElementById('map-inner').style.transform = 'scale(1)';
+  updateZoomDisplay();
+}
+
+/* Layer toggle */
+function toggleLayer(id, button) {
+  const el = document.getElementById(id);
+  if (el.style.display === 'block') {
+    el.style.display = 'none';
+    button.classList.remove('active');
+  } else {
+    el.style.display = 'block';
+    button.classList.add('active');
+  }
+  updateLegend();
+}
+
+/* Legende updaten */
+function updateLegend() {
+  const legendList = document.getElementById('legend-list');
+  buildLegendContent(legendList, false); // false = for display
   adjustLegendPadding();
+}
+
+/* Platz für Quelle unten */
+function adjustLegendPadding() {
+  const source = document.getElementById('source-tab');
+  const legend = document.getElementById('legend-container');
+  legend.style.paddingBottom = source.offsetHeight + 'px';
+}
+
+/* Export */
+async function exportVisibleLayers() {
+  // Export map using universal builder
+  const mapCanvas = document.createElement('canvas');
+  await buildMapLayers(mapCanvas, true); // true = for export
+  
+  const mapLink = document.createElement('a');
+  mapLink.download = 'Analysekarte.png';
+  mapLink.href = mapCanvas.toDataURL('image/png');
+  mapLink.click();
+
+  // Export legend
+  const legendCanvas = await exportLegendToCanvas();
+  if (legendCanvas) {
+    const legendLink = document.createElement('a');
+    legendLink.download = 'Analysekarte_Legende.png';
+    legendLink.href = legendCanvas.toDataURL('image/png');
+    legendLink.click();
+  }
 }
 
 /* Init */
@@ -611,5 +542,3 @@ updateLegend();
 </script>
 </body>
 </html>
-
-
