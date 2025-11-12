@@ -345,7 +345,7 @@ async function exportVisibleLayers() {
     // Use html2canvas library for proper rendering
     const legendCanvas = await html2canvas(tempLegend, {
       backgroundColor: '#ffffff',
-      scale: 2, // Higher resolution
+      scale: 3, // Higher resolution
       useCORS: true,
       allowTaint: true
     });
@@ -492,6 +492,7 @@ updateLegend();
 </script>
 </body>
 </html>
+
 
 
 
