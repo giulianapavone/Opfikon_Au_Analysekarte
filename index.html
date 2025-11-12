@@ -75,82 +75,45 @@
     flex-direction: column;
     background: #fff;
     padding: 4px;
-    border-left: 1px solid #ddd;
-    position: relative;
+    box-sizing: border-box;
   }
-
-  /* Einheitliches Button-Design */
-  button {
+  
+  /* Standard-Buttons */
+  .sidebar-section button {
     display: block;
     width: 100%;
-    /* padding: 2px 4px; */
     margin-bottom: 2px;
-    border: none;
     border-radius: 4px;
     background-color: #ccc;
     cursor: pointer;
-    font-size: 14px;
+    font-size: 11px;
     transition: background-color 0.2s;
   }
-
-  button:hover { background-color: #bbb; }
-  button.active { background-color: #4CAF50; color: white; }
-
-  /* Zoom controls */
-  #zoom-controls {
-    display: grid;
-    grid-template-columns: repeat(5, 1fr);
-    gap: 2px;
-    width: 100%;
-  }
-
-  #zoom-controls button {
-   font-size: 11px;
-  }
-
-  /* Layer buttons */
-  #buttons { 
-   /*margin-top: 4px;*/
-  }
-
-  /* Legend */
-  #legend-container {
-    flex: 1;
-    overflow-y: auto;
-    margin-top: 4px;
-  }
-
-  #legend-title {
-    position: sticky;
-    top: 0;
-    background: #fff;
-    z-index: 12;
-    display: none;
-    font-weight: bold;
-  }
-
-  #legend-list { 
-   list-style: none;
-  }
-
-  #legend-list li {
-    margin: 2px 0;
-    display: flex;
-    align-items: center;
+  .sidebar-section button:hover { background-color: #bbb; }
+  .sidebar-section button.active { background-color: #4CAF50; color: white; }
+  
+  /* Layer-Buttons grössere Schrift */
+  #layer-buttons button {
     font-size: 14px;
   }
-
-  #legend-list li span {
-    display: inline-block;
+  
+  #legend-list li {
+    display: flex;
+    align-items: center;
+    font-size: 11px; /* Schrift für Legenden-Items */
+  }
+  
+  #legend-list li span,
+  #legend-list li img {
     width: 20px;
     height: 20px;
     margin-right: 5px;
-    vertical-align: middle;
     background-size: contain;
     background-repeat: no-repeat;
     background-position: center;
+    vertical-align: middle;
   }
-
+  
   #legend-list li img {
     display: inline-block;
     width: 20px;
@@ -159,28 +122,25 @@
     margin-right: 5px;
     vertical-align: middle;
   }
-
-  /* Quellen & Export */
-  #source-tab {
-    position: fixed;
-    bottom: 0;
-    right: 0;
-    width: 240px;
-    text-align: center;
+  
+  #legend-container .legend-title {
+    position: sticky;
+    top: 0;
+    z-index: 12;
+    font-weight: bold;
+    font-size: 14px;
+  }
+  
+  /* Quellen-Text */
+  #sidebar-source {
     font-size: 11px;
-    color: #555;
-    padding: 6px;
-    background-color: rgba(255, 255, 255, 0.8);
-    backdrop-filter: blur(2px);
-    display: flex;
-    flex-direction: column;
-    align-items: center;
   }
-
-  #source-tab button { 
-   font-size: 11px; 
-   /* margin-top: 2px; */
+  
+  /* Export Button */
+  #sidebar-export button {
+    font-size: 11px;
   }
+  
 </style>
 </head>
 <body>
@@ -207,8 +167,8 @@
 
 <!-- Sidebar -->
 <div id="sidebar">
-  <!-- Zoom controls -->
-  <div id="zoom-controls">
+  <!-- 1. Zoom Buttons -->
+  <div class="sidebar-section" id="zoom-controls">
     <button onclick="zoomMap(-10)">-10%</button>
     <button onclick="zoomMap(-5)">-5%</button>
     <button id="zoom-default" onclick="zoomDefault()">100%</button>
@@ -216,8 +176,8 @@
     <button onclick="zoomMap(10)">+10%</button>
   </div>
 
-  <!-- Layer buttons -->
-  <div id="buttons">
+  <!-- 2. Layer Buttons -->
+  <div class="sidebar-section" id="layer-buttons">
     <button onclick="toggleLayer('Analysekarte-Bauzonen', this)">Bauzonen</button>
     <button onclick="toggleLayer('Analysekarte-Gebaeudealter', this)">Gebäudealter</button>
     <button onclick="toggleLayer('Analysekarte-Eigentuemer', this)">Grundeigentümer</button>
@@ -230,17 +190,21 @@
     <button onclick="toggleLayer('Analysekarte-Fluglaerm', this)">Fluglärm</button>
   </div>
 
-  <!-- Legend -->
-  <div id="legend-container">
-    <div id="legend-title">Legende</div>
+  <!-- 3. Legende -->
+  <div class="sidebar-section" id="legend-container">
+    <div class="legend-title">Legende</div>
     <ul id="legend-list"></ul>
   </div>
-</div>
 
-<!-- Quellen & Export -->
-<div id="source-tab">
-  <div>Quellen: GIS-ZH, Swisstopo & Google Maps</div>
-  <button onclick="exportVisibleLayers()">Exportieren</button>
+  <!-- 4. Quellen -->
+  <div class="sidebar-section" id="sidebar-source">
+    Quellen: GIS-ZH, Swisstopo & Google Maps
+  </div>
+
+  <!-- 5. Export -->
+  <div class="sidebar-section" id="sidebar-export">
+    <button onclick="exportVisibleLayers()">Exportieren</button>
+  </div>
 </div>
 
 <script>
@@ -448,4 +412,5 @@ window.addEventListener('resize', adjustLegendPadding);
 </script>
 </body>
 </html>
+
 
