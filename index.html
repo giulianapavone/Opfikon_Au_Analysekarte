@@ -102,6 +102,28 @@
     background-color: #bbb;
   }
 
+  #export-container {
+    margin-top: 4px;
+    margin-bottom: 4px;
+  }
+  
+  #export-button {
+    width: 100%;
+    padding: 4px;
+    font-size: 13px;
+    border: none;
+    border-radius: 4px;
+    background-color: #4caf50;
+    color: white;
+    cursor: pointer;
+    transition: background-color 0.2s;
+  }
+  
+  #export-button:hover {
+    background-color: #45a049;
+  }
+
+
   /* Layer toggle buttons */
   #buttons {
     top: 0;
@@ -220,6 +242,10 @@
     <button onclick="zoomMap(5)">+5%</button>
     <button onclick="zoomMap(10)">+10%</button>
   </div>
+
+ <div id="export-container">
+   <button id="export-button" onclick="exportVisibleLayers()">Exportieren (sichtbare Layer)</button>
+ </div>
 
   <div id="buttons">
     <button onclick="toggleLayer('Analysekarte-Bauzonen', this)">Bauzonen</button>
@@ -467,9 +493,46 @@ updateZoomDisplay();
 adjustLegendPadding();
 updateLegend();
 
+async function exportVisibleLayers() {
+  const mapInner = document.getElementById('map-inner');
+  const layers = Array.from(mapInner.querySelectorAll('.layer'))
+    .filter(layer => layer.style.display === 'block');
+
+  if (layers.length === 0) {
+    alert('Keine sichtbaren Layer zum Exportieren.');
+    return;
+  }
+
+  const base = layers[0];
+  const width = base.naturalWidth;
+  const height = base.naturalHeight;
+
+  const canvas = document.createElement('canvas');
+  canvas.width = width;
+  canvas.height = height;
+  const ctx = canvas.getContext('2d');
+
+  for (const layer of layers) {
+    await new Promise((resolve, reject) => {
+      const img = new Image();
+      img.crossOrigin = 'anonymous';
+      img.onload = () => {
+        ctx.drawImage(img, 0, 0, width, height);
+        resolve();
+      };
+      img.onerror = reject;
+      img.src = layer.src;
+    });
+  }
+
+  const link = document.createElement('a');
+  link.download = 'Analysekarte_Export.png';
+  link.href = canvas.toDataURL('image/png');
+  link.click();
+}
+ 
 window.addEventListener('resize', adjustLegendPadding);
 </script>
 
 </body>
 </html>
-
