@@ -106,7 +106,7 @@
     width: 100%;
     padding: 2px 4px;
     margin-bottom: 2px;
-    font-size: 11px;
+    font-size: 14px;
     cursor: pointer;
     border: none;
     border-radius: 4px;
@@ -229,6 +229,10 @@
 <!-- Right: sidebar -->
 <div id="sidebar">
 
+  <div id="export-container">
+    <button id="export-button" onclick="exportVisibleLayers()">Exportieren</button>
+  </div>
+ 
   <div id="zoom-controls">
     <button onclick="zoomMap(-10)">-10%</button>
     <button onclick="zoomMap(-5)">-5%</button>
@@ -236,10 +240,6 @@
     <button onclick="zoomMap(5)">+5%</button>
     <button onclick="zoomMap(10)">+10%</button>
   </div>
-
- <div id="export-container">
-   <button id="export-button" onclick="exportVisibleLayers()">Exportieren</button>
- </div>
 
   <div id="buttons">
     <button onclick="toggleLayer('Analysekarte-Bauzonen', this)">Bauzonen</button>
@@ -489,27 +489,34 @@ updateLegend();
 
 async function exportVisibleLayers() {
   const mapInner = document.getElementById('map-inner');
-  const layers = Array.from(mapInner.querySelectorAll('.layer'))
-    .filter(layer => layer.style.display === 'block');
+  // Alle Layer in DOM-Reihenfolge (von unten nach oben)
+  const allLayers = Array.from(mapInner.querySelectorAll('.layer'));
 
-  if (layers.length === 0) {
+  // Nur sichtbare Layer auswählen
+  const visibleLayers = allLayers.filter(layer => layer.style.display === 'block');
+
+  if (visibleLayers.length === 0) {
     alert('Keine sichtbaren Layer zum Exportieren.');
     return;
   }
 
-  const base = layers[0];
-  const width = base.naturalWidth;
-  const height = base.naturalHeight;
+  // Erste sichtbare als Referenz für Größe
+  const refLayer = visibleLayers[0];
+  const width = refLayer.naturalWidth;
+  const height = refLayer.naturalHeight;
 
+  // Canvas vorbereiten
   const canvas = document.createElement('canvas');
   canvas.width = width;
   canvas.height = height;
   const ctx = canvas.getContext('2d');
 
+  // 🟦 Weißer Hintergrund zuerst
   ctx.fillStyle = 'white';
   ctx.fillRect(0, 0, width, height);
 
-  for (const layer of layers) {
+  // 🔄 Sichtbare Layer in DOM-Reihenfolge (von unten nach oben) zeichnen
+  for (const layer of visibleLayers) {
     await new Promise((resolve, reject) => {
       const img = new Image();
       img.crossOrigin = 'anonymous';
@@ -522,14 +529,17 @@ async function exportVisibleLayers() {
     });
   }
 
+  // 💾 PNG speichern
   const link = document.createElement('a');
   link.download = 'Analysekarte_Export.png';
   link.href = canvas.toDataURL('image/png');
   link.click();
 }
 
+ 
 window.addEventListener('resize', adjustLegendPadding);
 </script>
 
 </body>
 </html>
+
