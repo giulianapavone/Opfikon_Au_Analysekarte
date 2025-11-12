@@ -20,7 +20,6 @@
     overflow: hidden;
   }
 
-  /* Map Container */
   #main-column {
     display: flex;
     flex-direction: column;
@@ -184,6 +183,7 @@
   }
 
   #source-tab button {
+    margin-top: 2px;
     font-size: 11px;
   }
 </style>
@@ -212,7 +212,7 @@
 
 <!-- Sidebar -->
 <div id="sidebar">
-  <!-- Zoom controls -->
+
   <div id="zoom-controls">
     <button onclick="zoomMap(-10)">-10%</button>
     <button onclick="zoomMap(-5)">-5%</button>
@@ -221,7 +221,6 @@
     <button onclick="zoomMap(10)">+10%</button>
   </div>
 
-  <!-- Layer buttons -->
   <div id="buttons">
     <button onclick="toggleLayer('Analysekarte-Bauzonen', this)">Bauzonen</button>
     <button onclick="toggleLayer('Analysekarte-Gebaeudealter', this)">Gebäudealter</button>
@@ -235,7 +234,6 @@
     <button onclick="toggleLayer('Analysekarte-Fluglaerm', this)">Fluglärm</button>
   </div>
 
-  <!-- Legend -->
   <div id="legend-container">
     <div id="legend-title">Legende</div>
     <ul id="legend-list"></ul>
@@ -251,7 +249,6 @@
 <script>
 let zoom = 100;
 
-/* Zoom-Funktionen */
 function updateZoomDisplay() {
   document.getElementById('zoom-default').textContent = zoom + '%';
 }
@@ -270,7 +267,6 @@ function zoomDefault() {
   updateZoomDisplay();
 }
 
-/* Layer toggle */
 function toggleLayer(id, button) {
   const el = document.getElementById(id);
   if (el.style.display === 'block') {
@@ -283,7 +279,11 @@ function toggleLayer(id, button) {
   updateLegend();
 }
 
-/* Export */
+// Initialisierung
+document.getElementById('Analysekarte-Basekarte').style.display='block';
+document.getElementById('Analysekarte-Glatt').style.display='block';
+updateZoomDisplay();
+
 async function exportVisibleLayers() {
   const mapInner = document.getElementById('map-inner');
   const allLayers = Array.from(mapInner.querySelectorAll('.layer'));
@@ -294,8 +294,12 @@ async function exportVisibleLayers() {
     return;
   }
 
-  // Nach z-index sortieren (unten nach oben)
-  visibleLayers.sort((a, b) => (parseInt(getComputedStyle(a).zIndex) || 0) - (parseInt(getComputedStyle(b).zIndex) || 0));
+  // Sortiere nach tatsächlichem z-index (von unten nach oben)
+  visibleLayers.sort((a, b) => {
+    const za = parseInt(getComputedStyle(a).zIndex) || 0;
+    const zb = parseInt(getComputedStyle(b).zIndex) || 0;
+    return za - zb;
+  });
 
   const ref = visibleLayers[0];
   const width = ref.naturalWidth;
@@ -324,11 +328,7 @@ async function exportVisibleLayers() {
   link.href = canvas.toDataURL('image/png');
   link.click();
 }
-
-/* Initialisierung */
-document.getElementById('Analysekarte-Basekarte').style.display='block';
-document.getElementById('Analysekarte-Glatt').style.display='block';
-updateZoomDisplay();
+ 
 </script>
 </body>
 </html>
