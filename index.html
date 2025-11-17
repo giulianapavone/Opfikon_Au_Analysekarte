@@ -520,7 +520,7 @@ async function exportLegend() {
 
   const canvas = await html2canvas(exportWrapper, {
     backgroundColor: 'white',
-    scale: 2
+    scale: 6
   });
 
   document.body.removeChild(exportWrapper);
@@ -540,5 +540,6 @@ updateLegend();
 </body>
 
 </html>
+
 
 
