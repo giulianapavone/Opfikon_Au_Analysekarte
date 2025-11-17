@@ -415,6 +415,73 @@ function updateLegend() {
   layerLegends.forEach(group => {
     const activeLayers = group.layers.filter(layer => document.getElementById(layer.id).style.display === 'block');
     if (activeLayers.length > 0) {
+      // Gruppenüberschrift
+      const liGroup = document.createElement('li');
+      liGroup.innerHTML = `<strong>${group.title}</strong>`;
+      liGroup.style.marginTop = '6px';
+      liGroup.style.fontSize = '15px';
+      legendList.appendChild(liGroup);
+
+      activeLayers.forEach(layer => {
+        layer.items.forEach(item => {
+          // Untertitel
+          if (item.subtitle) {
+            const liSub = document.createElement('li');
+            liSub.textContent = item.label;
+            liSub.style.fontWeight = 'bold';
+            liSub.style.fontSize = '13px';
+            legendList.appendChild(liSub);
+            return;
+          }
+
+          // Symbol erstellen
+          const li = document.createElement('li');
+          let symbol;
+
+          if (item.icon) {
+            symbol = document.createElement('img');
+            symbol.src = item.icon;
+            symbol.style.width = '20px';
+            symbol.style.height = '20px';
+            symbol.style.objectFit = 'contain';
+            symbol.style.margin = '2px';
+          } else if (item.line) {
+            symbol = document.createElement('span');
+            symbol.style.display = 'inline-block';
+            symbol.style.width = '20px';
+            symbol.style.height = '4px';
+            symbol.style.backgroundImage = `linear-gradient(to right, ${item.color} 100%, transparent 0)`;
+            symbol.style.backgroundSize = '100% 100%';
+            symbol.style.backgroundRepeat = 'no-repeat';
+            symbol.style.margin = '2px';
+          } else if (item.color) {
+            symbol = document.createElement('span');
+            symbol.style.display = 'inline-block';
+            symbol.style.width = '20px';
+            symbol.style.height = '20px';
+            symbol.style.backgroundColor = item.color;
+            symbol.style.margin = '2px';
+          }
+
+          li.appendChild(symbol);
+          li.appendChild(document.createTextNode(item.label));
+          legendList.appendChild(li);
+        });
+      });
+    }
+  });
+
+  legendTitle.style.display = legendList.children.length > 0 ? 'block' : 'none';
+  adjustLegendPadding();
+}
+/* function updateLegend() {
+  const legendList = document.getElementById('legend-list');
+  const legendTitle = document.getElementById('legend-title');
+  legendList.innerHTML = '';
+
+  layerLegends.forEach(group => {
+    const activeLayers = group.layers.filter(layer => document.getElementById(layer.id).style.display === 'block');
+    if (activeLayers.length > 0) {
       const liGroup = document.createElement('li');
       liGroup.innerHTML = `<strong>${group.title}</strong>`;
       liGroup.style.marginTop = '6px';
@@ -437,6 +504,11 @@ function updateLegend() {
 
           if (item.icon) {
             symbol.style.backgroundImage = `url('${item.icon}')`;
+            symbol = document.createElement('img');
+            symbol.src = item.icon;
+            symbol.style.width = '20px';
+            symbol.style.height = '20px';
+            symbol.style.objectFit = 'contain';
           } else if (item.line) {
             symbol.style.backgroundImage = `linear-gradient(to right, ${item.color} 100%, transparent 0)`;
             symbol.style.backgroundSize = '100% 4px';
@@ -460,7 +532,7 @@ function updateLegend() {
 
   legendTitle.style.display = legendList.children.length > 0 ? 'block' : 'none';
   adjustLegendPadding();
-}
+} */
  
 /* Export Map */
 async function exportVisibleLayers() {
@@ -520,7 +592,7 @@ async function exportLegend() {
 
   const canvas = await html2canvas(exportWrapper, {
     backgroundColor: 'white',
-    scale: 6
+    scale: 1
   });
 
   document.body.removeChild(exportWrapper);
