@@ -12,7 +12,7 @@
     box-sizing: border-box;
   }
 
-  /* Desktop Version */
+  // Desktop Version
   body {
     display: flex;
     flex-direction: row;
@@ -22,7 +22,7 @@
     overflow: hidden;
   }
 
-  /* Map container */
+  // Map container
   #main-column {
     display: flex;
     flex-direction: column;
@@ -56,7 +56,7 @@
     display: none;
   }
 
-  /* Layer order */
+  // Layer order
   #Analysekarte-Glatt { z-index: 0; display: block; }
   #Analysekarte-Bauzonen { z-index: 1; }
   #Analysekarte-Strassenlaerm { z-index: 2; }
@@ -70,7 +70,7 @@
   #Analysekarte-Fussgaengerstreifen { z-index: 10; }
   #Analysekarte-Busstationen { z-index: 11; }
 
-  /* Sidebar */
+  // Sidebar
   #sidebar {
     width: 240px;
     display: flex;
@@ -81,7 +81,7 @@
     position: relative;
   }
 
-  /* Button design */
+  // Button design
   button {
     display: block;
     width: 100%;
@@ -98,7 +98,7 @@
   button:hover { background-color: #bbb; }
   button.active { background-color: #1976D2; color: white; }
 
-  /* Zoom controls */
+  // Zoom controls
   #zoom-controls {
     display: grid;
     grid-template-columns: repeat(5, 1fr);
@@ -110,10 +110,10 @@
    font-size: 12px;
   }
 
-  /* Layer buttons */
+  // Layer buttons
   #buttons { }
 
-  /* Legend */
+  // Legend
   #legend-container {
     flex: 1;
     overflow-y: auto;
@@ -160,7 +160,7 @@
     vertical-align: middle;
   }
 
-  /* Quellen & Export */
+  // Quellen & Export
   #source-tab {
    position: absolute;
    bottom: 0;
@@ -190,7 +190,7 @@
     background-color: rgba(153, 153, 153, 0.5);
   }
 
-  /* Mobile styles */
+  // Mobile styles
   @media (max-width: 600px) {
     body {
       flex-direction: column;
@@ -291,7 +291,7 @@
 <script>
 let zoom = 100;
 
-/* Zoom */
+// Zoom
 function updateZoomDisplay() {
   document.getElementById('zoom-default').textContent = zoom + '%';
 }
@@ -310,7 +310,7 @@ function zoomDefault() {
   updateZoomDisplay();
 }
 
-/* Layer toggle */
+// Layer toggle
 function toggleLayer(id, button) {
   const el = document.getElementById(id);
 
@@ -344,7 +344,7 @@ function toggleLayer(id, button) {
   updateLegend();
 }
 
-/* Layer Legendeninfos */
+// Layer Legendeninfos
 const layerLegends = [
   { title: "Bauzonen", layers: [{ id: "Analysekarte-Bauzonen", items: [
     { label: "WG3", color: "#989dbe" },
@@ -400,8 +400,8 @@ const layerLegends = [
   ]}]}
 ];
 
-/* Legende updaten */
-/* Platz für Quelle unten */
+// Legende updaten
+// Platz für Quelle unten
 function adjustLegendPadding() {
   const source = document.getElementById('source-tab');
   const legend = document.getElementById('legend-container');
@@ -462,7 +462,7 @@ function updateLegend() {
   adjustLegendPadding();
 }
  
-/* Export */
+// Export
 async function exportVisibleLayers() {
   const mapInner = document.getElementById('map-inner');
   const allLayers = Array.from(mapInner.querySelectorAll('.layer'));
@@ -497,47 +497,75 @@ async function exportVisibleLayers() {
   link.click();
 }
 
-// PDF Button Event
+// Export as Pdf
 document.getElementById('export-pdf-btn').addEventListener('click', async () => {
   const { jsPDF } = window.jspdf;
-  const doc = new jsPDF('landscape'); // A4 quer
+  const doc = new jsPDF('portrait'); // Hochformat
 
   const mapInner = document.getElementById('map-inner');
   const visibleLayers = Array.from(mapInner.querySelectorAll('.layer'))
     .filter(l => l.style.display === 'block');
 
-  // Basis-Maße: A4 quer = 297 x 210 mm
-  const pdfWidth = 297;
-  const pdfHeight = 210;
+  if (visibleLayers.length === 0) {
+    alert("Bitte mindestens eine Ebene anzeigen, um PDF zu exportieren.");
+    return;
+  }
 
-  // Canvas zum Kombinieren der Layer
-  const canvas = document.createElement('canvas');
+  // PDF page dimensions in mm
+  const pdfWidth = doc.internal.pageSize.getWidth();
+  const pdfHeight = doc.internal.pageSize.getHeight();
+  const margin = 10; // mm
+
+  // Canvas to combine map layers
   const ref = visibleLayers[0];
+  const canvas = document.createElement('canvas');
   canvas.width = ref.naturalWidth;
   canvas.height = ref.naturalHeight;
   const ctx = canvas.getContext('2d');
   ctx.fillStyle = 'white';
   ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-  // Layer übereinander zeichnen
+  // Draw layers
   for (const layer of visibleLayers) {
     await new Promise((resolve, reject) => {
       const img = new Image();
-      img.src = layer.src;
+      img.crossOrigin = 'anonymous';
       img.onload = () => { ctx.drawImage(img, 0, 0, canvas.width, canvas.height); resolve(); };
       img.onerror = reject;
+      img.src = layer.src;
     });
   }
 
-  // Canvas als Bild ins PDF
+  // Convert to image
   const imgData = canvas.toDataURL('image/png');
-  doc.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
 
-  // PDF speichern
-  doc.save('Analysekarte.pdf');
+  // Calculate scaled dimensions to fit page with margin
+  const pageWidth = pdfWidth - 2 * margin;
+  const pageHeight = pdfHeight - 2 * margin;
+  const scale = Math.min(pageWidth / canvas.width, pageHeight / canvas.height);
+  const imgWidth = canvas.width * scale;
+  const imgHeight = canvas.height * scale;
+  const xOffset = (pdfWidth - imgWidth) / 2;
+  const yOffset = (pdfHeight - imgHeight) / 2;
+
+  // Add map on first page
+  doc.addImage(imgData, 'PNG', xOffset, yOffset, imgWidth, imgHeight);
+
+  // Add legend on second page
+  doc.addPage();
+  const legendList = document.getElementById('legend-list').cloneNode(true);
+  const legendHTML = `<div style="font-family:sans-serif; font-size:12px;">${legendList.innerHTML}</div>`;
+  doc.html(legendHTML, {
+    x: margin,
+    y: margin,
+    width: pdfWidth - 2*margin,
+    callback: () => {
+      doc.save('Analysekarte.pdf');
+    }
+  });
 });
 
-/* Init */
+// Init
 document.getElementById('Analysekarte-Basekarte').style.display = 'block';
 document.getElementById('Analysekarte-Glatt').style.display = 'block';
 updateZoomDisplay();
@@ -546,7 +574,3 @@ updateLegend();
 </body>
 
 </html>
-
-
-
-
