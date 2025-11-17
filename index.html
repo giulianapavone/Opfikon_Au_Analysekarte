@@ -282,7 +282,8 @@
   <!-- Quellen & Export - inside sidebar at bottom -->
   <div id="source-tab">
     <div>Quellen: GIS-ZH, Swisstopo & Google Maps</div>
-    <button onclick="exportVisibleLayers()">Exportieren</button>
+    <button onclick="exportVisibleLayers()">als PNG exportieren</button>
+    <button id="export-pdf-btn">als PDF exportieren</button>
   </div>
 </div>
 
@@ -340,41 +341,6 @@ function toggleLayer(id, button) {
   }
 
   updateLegend();
-}
-
-/* Export */
-async function exportVisibleLayers() {
-  const mapInner = document.getElementById('map-inner');
-  const allLayers = Array.from(mapInner.querySelectorAll('.layer'));
-  const visibleLayers = allLayers.filter(l => l.style.display === 'block');
-  
-  visibleLayers.sort((a, b) => (parseInt(getComputedStyle(a).zIndex) || 0) - (parseInt(getComputedStyle(b).zIndex) || 0));
-
-  const ref = visibleLayers[0];
-  const width = ref.naturalWidth;
-  const height = ref.naturalHeight;
-
-  const canvas = document.createElement('canvas');
-  canvas.width = width;
-  canvas.height = height;
-  const ctx = canvas.getContext('2d');
-  ctx.fillStyle = 'white';
-  ctx.fillRect(0, 0, width, height);
-
-  for (const layer of visibleLayers) {
-    await new Promise((resolve, reject) => {
-      const img = new Image();
-      img.crossOrigin = 'anonymous';
-      img.onload = () => { ctx.drawImage(img, 0, 0, width, height); resolve(); };
-      img.onerror = reject;
-      img.src = layer.src;
-    });
-  }
-
-  const link = document.createElement('a');
-  link.download = 'Analysekarte_Export.png';
-  link.href = canvas.toDataURL('image/png');
-  link.click();
 }
 
 /* Layer Legendeninfos */
@@ -494,6 +460,75 @@ function updateLegend() {
   legendTitle.style.display = legendList.children.length > 0 ? 'block' : 'none';
   adjustLegendPadding();
 }
+ 
+/* Export */
+async function exportVisibleLayers() {
+  const mapInner = document.getElementById('map-inner');
+  const allLayers = Array.from(mapInner.querySelectorAll('.layer'));
+  const visibleLayers = allLayers.filter(l => l.style.display === 'block');
+  
+  visibleLayers.sort((a, b) => (parseInt(getComputedStyle(a).zIndex) || 0) - (parseInt(getComputedStyle(b).zIndex) || 0));
+
+  const ref = visibleLayers[0];
+  const width = ref.naturalWidth;
+  const height = ref.naturalHeight;
+
+  const canvas = document.createElement('canvas');
+  canvas.width = width;
+  canvas.height = height;
+  const ctx = canvas.getContext('2d');
+  ctx.fillStyle = 'white';
+  ctx.fillRect(0, 0, width, height);
+
+  for (const layer of visibleLayers) {
+    await new Promise((resolve, reject) => {
+      const img = new Image();
+      img.crossOrigin = 'anonymous';
+      img.onload = () => { ctx.drawImage(img, 0, 0, width, height); resolve(); };
+      img.onerror = reject;
+      img.src = layer.src;
+    });
+  }
+
+  const link = document.createElement('a');
+  link.download = 'Analysekarte_Export.png';
+  link.href = canvas.toDataURL('image/png');
+  link.click();
+}
+
+// PDF Button Event
+document.getElementById('export-pdf-btn').addEventListener('click', () => {
+  // Sichtbare Layer sammeln
+  const visibleLayers = Array.from(document.querySelectorAll('.layer'))
+    .filter(l => l.style.display === 'block')
+    .map(l => l.src.replace(/^.*[\\\/]/, '')); // nur Dateiname
+
+  // Legende für sichtbare Layer sammeln
+  const legendData = layerLegends.flatMap(group =>
+    group.layers
+      .filter(layer => document.getElementById(layer.id).style.display === 'block')
+      .flatMap(layer => layer.items.map(item => ({
+        label: item.label,
+        icon: item.icon ? item.icon.replace(/^.*[\\\/]/, '') : null,
+        color: item.color || null,
+        line: item.line || false
+      })))
+  );
+
+  // JSON erstellen
+  const data = { visibleLayers, legendData };
+
+  // JSON-Datei herunterladen
+  const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'export_data.json';
+  a.click();
+  URL.revokeObjectURL(url);
+
+  alert("JSON für PDF exportiert. Python Script kann nun PDF erzeugen.");
+});
 
 /* Init */
 document.getElementById('Analysekarte-Basekarte').style.display = 'block';
@@ -504,4 +539,5 @@ updateLegend();
 </body>
 
 </html>
+
 
