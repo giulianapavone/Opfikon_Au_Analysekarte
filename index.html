@@ -12,7 +12,7 @@
     box-sizing: border-box;
   }
 
-  // Desktop Version
+  /* Desktop Version */
   body {
     display: flex;
     flex-direction: row;
@@ -22,7 +22,7 @@
     overflow: hidden;
   }
 
-  // Map container
+  /* Map container */
   #main-column {
     display: flex;
     flex-direction: column;
@@ -56,7 +56,7 @@
     display: none;
   }
 
-  // Layer order
+  /* Layer order */
   #Analysekarte-Glatt { z-index: 0; display: block; }
   #Analysekarte-Bauzonen { z-index: 1; }
   #Analysekarte-Strassenlaerm { z-index: 2; }
@@ -70,7 +70,7 @@
   #Analysekarte-Fussgaengerstreifen { z-index: 10; }
   #Analysekarte-Busstationen { z-index: 11; }
 
-  // Sidebar
+  /* Sidebar */
   #sidebar {
     width: 240px;
     display: flex;
@@ -81,7 +81,7 @@
     position: relative;
   }
 
-  // Button design
+  /* Button design */
   button {
     display: block;
     width: 100%;
@@ -98,7 +98,7 @@
   button:hover { background-color: #bbb; }
   button.active { background-color: #1976D2; color: white; }
 
-  // Zoom controls
+  /* Zoom controls */
   #zoom-controls {
     display: grid;
     grid-template-columns: repeat(5, 1fr);
@@ -110,10 +110,10 @@
    font-size: 12px;
   }
 
-  // Layer buttons
+  /* Layer buttons */
   #buttons { }
 
-  // Legend
+  /* Legend */
   #legend-container {
     flex: 1;
     overflow-y: auto;
@@ -160,7 +160,7 @@
     vertical-align: middle;
   }
 
-  // Quellen & Export
+  /* Quellen & Export */
   #source-tab {
    position: absolute;
    bottom: 0;
@@ -190,7 +190,7 @@
     background-color: rgba(153, 153, 153, 0.5);
   }
 
-  // Mobile styles
+  /* Mobile styles */
   @media (max-width: 600px) {
     body {
       flex-direction: column;
@@ -291,7 +291,7 @@
 <script>
 let zoom = 100;
 
-// Zoom
+/* Zoom */
 function updateZoomDisplay() {
   document.getElementById('zoom-default').textContent = zoom + '%';
 }
@@ -310,7 +310,7 @@ function zoomDefault() {
   updateZoomDisplay();
 }
 
-// Layer toggle
+/* Layer toggle */
 function toggleLayer(id, button) {
   const el = document.getElementById(id);
 
@@ -344,7 +344,7 @@ function toggleLayer(id, button) {
   updateLegend();
 }
 
-// Layer Legendeninfos
+/* Layer Legendeninfos */
 const layerLegends = [
   { title: "Bauzonen", layers: [{ id: "Analysekarte-Bauzonen", items: [
     { label: "WG3", color: "#989dbe" },
@@ -400,8 +400,8 @@ const layerLegends = [
   ]}]}
 ];
 
-// Legende updaten
-// Platz für Quelle unten
+/* Legende updaten */
+/* Platz für Quelle unten */
 function adjustLegendPadding() {
   const source = document.getElementById('source-tab');
   const legend = document.getElementById('legend-container');
@@ -462,7 +462,7 @@ function updateLegend() {
   adjustLegendPadding();
 }
  
-// Export
+/* Export */
 async function exportVisibleLayers() {
   const mapInner = document.getElementById('map-inner');
   const allLayers = Array.from(mapInner.querySelectorAll('.layer'));
@@ -497,7 +497,7 @@ async function exportVisibleLayers() {
   link.click();
 }
 
-// Export as Pdf
+// PDF Button Event
 document.getElementById('export-pdf-btn').addEventListener('click', async () => {
   const { jsPDF } = window.jspdf;
   const doc = new jsPDF('portrait'); // Hochformat
@@ -565,7 +565,7 @@ document.getElementById('export-pdf-btn').addEventListener('click', async () => 
   });
 });
 
-// Init
+/* Init */
 document.getElementById('Analysekarte-Basekarte').style.display = 'block';
 document.getElementById('Analysekarte-Glatt').style.display = 'block';
 updateZoomDisplay();
