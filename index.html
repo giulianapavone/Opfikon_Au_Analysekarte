@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <title>Opfikon Au, Analysekarte</title>
 <style>
   * {
@@ -283,8 +283,8 @@
   <!-- Quellen & Export - inside sidebar at bottom -->
   <div id="source-tab">
     <div>Quellen: GIS-ZH, Swisstopo & Google Maps</div>
-    <button onclick="exportVisibleLayers()">als PNG exportieren</button>
-    <button id="export-pdf-btn">als PDF exportieren</button>
+    <button onclick="exportVisibleLayers()">Karte Exportieren</button>
+    <button onclick="exportLegend()">Legende Exportieren</button>
   </div>
 </div>
 
@@ -462,7 +462,7 @@ function updateLegend() {
   adjustLegendPadding();
 }
  
-/* Export */
+/* Export Map */
 async function exportVisibleLayers() {
   const mapInner = document.getElementById('map-inner');
   const allLayers = Array.from(mapInner.querySelectorAll('.layer'));
@@ -497,77 +497,26 @@ async function exportVisibleLayers() {
   link.click();
 }
 
-// PDF Button Event
-document.getElementById('export-pdf-btn').addEventListener('click', async () => {
-  const { jsPDF } = window.jspdf;
-  const doc = new jsPDF('portrait');
-
-  const mapInner = document.getElementById('map-inner');
-  const visibleLayers = Array.from(mapInner.querySelectorAll('.layer'))
-    .filter(l => l.style.display === 'block');
-
-  if (visibleLayers.length === 0) return alert("Bitte mindestens eine Ebene anzeigen!");
-
-  // --- Page 1: Map ---
-  const ref = visibleLayers[0];
-  const canvas = document.createElement('canvas');
-  canvas.width = ref.naturalWidth;
-  canvas.height = ref.naturalHeight;
-  const ctx = canvas.getContext('2d');
-  ctx.fillStyle = 'white';
-  ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-  for (const layer of visibleLayers) {
-    await new Promise((resolve, reject) => {
-      const img = new Image();
-      img.crossOrigin = 'anonymous';
-      img.onload = () => { ctx.drawImage(img, 0, 0, canvas.width, canvas.height); resolve(); };
-      img.onerror = reject;
-      img.src = layer.src;
-    });
-  }
-
-  const imgData = canvas.toDataURL('image/png');
-  const pdfWidth = doc.internal.pageSize.getWidth();
-  const pdfHeight = doc.internal.pageSize.getHeight();
-  const margin = 10;
-  const scale = Math.min((pdfWidth-2*margin)/canvas.width, (pdfHeight-2*margin)/canvas.height);
-  const imgWidth = canvas.width*scale;
-  const imgHeight = canvas.height*scale;
-  const xOffset = (pdfWidth - imgWidth)/2;
-  const yOffset = (pdfHeight - imgHeight)/2;
-  doc.addImage(imgData, 'PNG', xOffset, yOffset, imgWidth, imgHeight);
-
-  // --- Page 2: Legend ---
-  doc.addPage();
-  const legendList = document.getElementById('legend-list').cloneNode(true);
+/* Export Legend */
+async function exportLegend() {
+  const legend = document.getElementById('legend-container');
   
-  // Draw legend items on canvas
-  const legendCanvas = document.createElement('canvas');
-  const ctxLegend = legendCanvas.getContext('2d');
-  const fontSize = 12;
-  ctxLegend.font = fontSize + "px sans-serif";
-  const items = Array.from(legendList.querySelectorAll('li'));
-  const itemHeight = fontSize + 8;
-  legendCanvas.width = 600; // arbitrary
-  legendCanvas.height = items.length * itemHeight + 20;
-  ctxLegend.fillStyle = "white";
-  ctxLegend.fillRect(0,0,legendCanvas.width,legendCanvas.height);
-  ctxLegend.fillStyle = "black";
+  // Temporarily expand legend height
+  const originalHeight = legend.style.height;
+  legend.style.height = 'auto';
 
-  items.forEach((li,i)=>{
-    const text = li.textContent;
-    ctxLegend.fillText(text, 10, (i+1)*itemHeight);
+  const canvas = await html2canvas(legend, {
+    backgroundColor: 'white',
+    scale: 2
   });
 
-  const legendImg = legendCanvas.toDataURL('image/png');
-  const scaleLegend = Math.min((pdfWidth-2*margin)/legendCanvas.width, (pdfHeight-2*margin)/legendCanvas.height);
-  const legendWidth = legendCanvas.width*scaleLegend;
-  const legendHeight = legendCanvas.height*scaleLegend;
-  doc.addImage(legendImg,'PNG',(pdfWidth-legendWidth)/2,(pdfHeight-legendHeight)/2,legendWidth,legendHeight);
+  legend.style.height = originalHeight; // restore
 
-  doc.save('Analysekarte.pdf');
-});
+  const link = document.createElement('a');
+  link.download = 'Legende.png';
+  link.href = canvas.toDataURL('image/png');
+  link.click();
+}
 
 /* Init */
 document.getElementById('Analysekarte-Basekarte').style.display = 'block';
@@ -578,4 +527,3 @@ updateLegend();
 </body>
 
 </html>
-
