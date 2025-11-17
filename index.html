@@ -497,37 +497,43 @@ async function exportVisibleLayers() {
 }
 
 // PDF Button Event
-document.getElementById('export-pdf-btn').addEventListener('click', () => {
-  // Sichtbare Layer sammeln
-  const visibleLayers = Array.from(document.querySelectorAll('.layer'))
-    .filter(l => l.style.display === 'block')
-    .map(l => l.src.replace(/^.*[\\\/]/, '')); // nur Dateiname
+document.getElementById('export-pdf-btn').addEventListener('click', async () => {
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF('landscape'); // A4 quer
 
-  // Legende für sichtbare Layer sammeln
-  const legendData = layerLegends.flatMap(group =>
-    group.layers
-      .filter(layer => document.getElementById(layer.id).style.display === 'block')
-      .flatMap(layer => layer.items.map(item => ({
-        label: item.label,
-        icon: item.icon ? item.icon.replace(/^.*[\\\/]/, '') : null,
-        color: item.color || null,
-        line: item.line || false
-      })))
-  );
+  const mapInner = document.getElementById('map-inner');
+  const visibleLayers = Array.from(mapInner.querySelectorAll('.layer'))
+    .filter(l => l.style.display === 'block');
 
-  // JSON erstellen
-  const data = { visibleLayers, legendData };
+  // Basis-Maße: A4 quer = 297 x 210 mm
+  const pdfWidth = 297;
+  const pdfHeight = 210;
 
-  // JSON-Datei herunterladen
-  const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = 'export_data.json';
-  a.click();
-  URL.revokeObjectURL(url);
+  // Canvas zum Kombinieren der Layer
+  const canvas = document.createElement('canvas');
+  const ref = visibleLayers[0];
+  canvas.width = ref.naturalWidth;
+  canvas.height = ref.naturalHeight;
+  const ctx = canvas.getContext('2d');
+  ctx.fillStyle = 'white';
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-  alert("JSON für PDF exportiert. Python Script kann nun PDF erzeugen.");
+  // Layer übereinander zeichnen
+  for (const layer of visibleLayers) {
+    await new Promise((resolve, reject) => {
+      const img = new Image();
+      img.src = layer.src;
+      img.onload = () => { ctx.drawImage(img, 0, 0, canvas.width, canvas.height); resolve(); };
+      img.onerror = reject;
+    });
+  }
+
+  // Canvas als Bild ins PDF
+  const imgData = canvas.toDataURL('image/png');
+  doc.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
+
+  // PDF speichern
+  doc.save('Analysekarte.pdf');
 });
 
 /* Init */
@@ -539,5 +545,6 @@ updateLegend();
 </body>
 
 </html>
+
 
 
