@@ -380,38 +380,36 @@ async function exportVisibleLayers() {
 /* Layer Legendeninfos */
 const layerLegends = [
   { title: "Bauzonen", layers: [{ id: "Analysekarte-Bauzonen", items: [
-    { label: "WG3", color: "#ffd4d0" },
-    { label: "W4", color: "#ffded0" },
-    { label: "W3", color: "#ffefd0" },
-    { label: "W2d", color: "#fff7d0" }
+    { label: "WG3", color: "#989dbe" },
+    { label: "W4", color: "#bd8d95" },
+    { label: "W3", color: "#ee9898" },
+    { label: "W2d", color: "#f0ae90" }
   ]}]},
   { title: "Baujahr", layers: [{ id: "Analysekarte-Gebaeudealter", items: [
-    { label: "1926-1950", color: "#ab3087" },
-    { label: "1951-1960", color: "#ec5689" },
-    { label: "1961-1970", color: "#f4737e" },
-    { label: "1971-1980", color: "#f5926e" },
-    { label: "1981-1990", color: "#edb066" },
-    { label: "1991-2000", color: "#e0cb6e" },
-    { label: "2001-2010", color: "#c8e17c" },
-    { label: "2011-heute", color: "#88e17c" }
+    { label: "1926-1950", color: "#9a1025" },
+    { label: "1951-1960", color: "#d13b52" },
+    { label: "1961-1970", color: "#c45a6a" },
+    { label: "1971-1980", color: "#c66a9d" },
+    { label: "1981-1990", color: "#a36df0" },
+    { label: "1991-2000", color: "#795bf4" },
+    { label: "2001-2010", color: "#292ff0" },
+    { label: "2011-heute", color: "#1f24b8" }
   ]}]},
   { title: "Grundeigentümer", layers: [{ id: "Analysekarte-Eigentuemer", items: [
-    { label: "Stockwerkeigentum", color: "#999999" },
-    { label: "Ein Farbton pro Partie:", subtitle: true },
-    { label: "Genossenschaften", gradient: "linear-gradient(to right,#64b5f6,#1976d2)" },
-    { label: "Aktiengesellschaften", gradient: "linear-gradient(to right,#ffc1c1,#8b0000)" },
-    { label: "Private Eigentümer", gradient: "linear-gradient(to right,#d5f5e3,#0a3211)" }
+    { label: "Genossenschaften", color: "#989dbe" },
+    { label: "Aktiengesellschaften", color: "#bd8d95" },
+    { label: "Private Eigentümer", color: "#ee9898" },
+    { label: "Stockwerkeigentum", color: "#f0ae90" }
   ]}]},
   { title: "Verkehr", layers: [
     { id: "Analysekarte-Fusswege", items: [
-      { label: "Fussgängerzugängliche Wege", line: true, color: "#ee000b" },
-      { label: "fehlende Fusswege", stripes: true, color: "#ee000b" }
+      { label: "Fussgängerzugängliche Wege", line: true, color: "#00711a" },
     ]},
     { id: "Analysekarte-Fussgaengerstreifen", items: [
       { label: "Fussgängerstreifen", icon: "Fussgaengerstreifensymbol.png" }
     ]},
     { id: "Analysekarte-Velowege", items: [
-      { label: "Veloweg", line: true, color: "#000aee" }
+      { label: "Veloweg", line: true, color: "#0a26ff" }
     ]},
     { id: "Analysekarte-Busstationen", items: [
       { label: "Bushaltestellen", icon: "Bushaltestellensymbol.png" }
@@ -421,17 +419,17 @@ const layerLegends = [
     ]}
   ]},
   { title: "Strassenlärm (06-22 Uhr)", layers: [{ id: "Analysekarte-Strassenlaerm", items: [
-    { label: ">= 75 dB(A)", color: "#787fab" },
-    { label: "70-74.9 dB(A)", color: "#bfadcc" },
-    { label: "65-69.9 dB(A)", color: "#aa6974" },
-    { label: "60-64.9 dB(A)", color: "#eb7878" },
-    { label: "55-59.9 dB(A)", color: "#ee966e" },
-    { label: "50-54.9 dB(A)", color: "#f9cc85" },
-    { label: "45-49.9 dB(A)", color: "#eee86e" },
-    { label: "40-44.9 dB(A)", color: "#677b64" }
+    { label: ">= 75 dB(A)", color: "#989dbe" },
+    { label: "70-74.9 dB(A)", color: "#cdbfd7" },
+    { label: "65-69.9 dB(A)", color: "#bd8d95" },
+    { label: "60-64.9 dB(A)", color: "#ee9898" },
+    { label: "55-59.9 dB(A)", color: "#f0ae90" },
+    { label: "50-54.9 dB(A)", color: "#f9d7a1" },
+    { label: "45-49.9 dB(A)", color: "#f0ec90" },
+    { label: "40-44.9 dB(A)", color: "#8b9a89" }
   ]}]},
   { title: "Fluglärm", layers: [{ id: "Analysekarte-Fluglaerm", items: [
-    { label: "65 dB(A)", line: true, color: "#007d1d" }
+    { label: "65 dB(A)", line: true, color: "#c30c00" }
   ]}]}
 ];
 
@@ -504,4 +502,5 @@ updateZoomDisplay();
 updateLegend();
 </script>
 </body>
+
 </html>
