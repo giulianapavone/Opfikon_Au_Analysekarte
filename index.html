@@ -500,23 +500,15 @@ async function exportVisibleLayers() {
 // PDF Button Event
 document.getElementById('export-pdf-btn').addEventListener('click', async () => {
   const { jsPDF } = window.jspdf;
-  const doc = new jsPDF('portrait'); // Hochformat
+  const doc = new jsPDF('portrait');
 
   const mapInner = document.getElementById('map-inner');
   const visibleLayers = Array.from(mapInner.querySelectorAll('.layer'))
     .filter(l => l.style.display === 'block');
 
-  if (visibleLayers.length === 0) {
-    alert("Bitte mindestens eine Ebene anzeigen, um PDF zu exportieren.");
-    return;
-  }
+  if (visibleLayers.length === 0) return alert("Bitte mindestens eine Ebene anzeigen!");
 
-  // PDF page dimensions in mm
-  const pdfWidth = doc.internal.pageSize.getWidth();
-  const pdfHeight = doc.internal.pageSize.getHeight();
-  const margin = 10; // mm
-
-  // Canvas to combine map layers
+  // --- Page 1: Map ---
   const ref = visibleLayers[0];
   const canvas = document.createElement('canvas');
   canvas.width = ref.naturalWidth;
@@ -525,7 +517,6 @@ document.getElementById('export-pdf-btn').addEventListener('click', async () => 
   ctx.fillStyle = 'white';
   ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-  // Draw layers
   for (const layer of visibleLayers) {
     await new Promise((resolve, reject) => {
       const img = new Image();
@@ -536,33 +527,46 @@ document.getElementById('export-pdf-btn').addEventListener('click', async () => 
     });
   }
 
-  // Convert to image
   const imgData = canvas.toDataURL('image/png');
-
-  // Calculate scaled dimensions to fit page with margin
-  const pageWidth = pdfWidth - 2 * margin;
-  const pageHeight = pdfHeight - 2 * margin;
-  const scale = Math.min(pageWidth / canvas.width, pageHeight / canvas.height);
-  const imgWidth = canvas.width * scale;
-  const imgHeight = canvas.height * scale;
-  const xOffset = (pdfWidth - imgWidth) / 2;
-  const yOffset = (pdfHeight - imgHeight) / 2;
-
-  // Add map on first page
+  const pdfWidth = doc.internal.pageSize.getWidth();
+  const pdfHeight = doc.internal.pageSize.getHeight();
+  const margin = 10;
+  const scale = Math.min((pdfWidth-2*margin)/canvas.width, (pdfHeight-2*margin)/canvas.height);
+  const imgWidth = canvas.width*scale;
+  const imgHeight = canvas.height*scale;
+  const xOffset = (pdfWidth - imgWidth)/2;
+  const yOffset = (pdfHeight - imgHeight)/2;
   doc.addImage(imgData, 'PNG', xOffset, yOffset, imgWidth, imgHeight);
 
-  // Add legend on second page
+  // --- Page 2: Legend ---
   doc.addPage();
   const legendList = document.getElementById('legend-list').cloneNode(true);
-  const legendHTML = `<div style="font-family:sans-serif; font-size:12px;">${legendList.innerHTML}</div>`;
-  doc.html(legendHTML, {
-    x: margin,
-    y: margin,
-    width: pdfWidth - 2*margin,
-    callback: () => {
-      doc.save('Analysekarte.pdf');
-    }
+  
+  // Draw legend items on canvas
+  const legendCanvas = document.createElement('canvas');
+  const ctxLegend = legendCanvas.getContext('2d');
+  const fontSize = 12;
+  ctxLegend.font = fontSize + "px sans-serif";
+  const items = Array.from(legendList.querySelectorAll('li'));
+  const itemHeight = fontSize + 8;
+  legendCanvas.width = 600; // arbitrary
+  legendCanvas.height = items.length * itemHeight + 20;
+  ctxLegend.fillStyle = "white";
+  ctxLegend.fillRect(0,0,legendCanvas.width,legendCanvas.height);
+  ctxLegend.fillStyle = "black";
+
+  items.forEach((li,i)=>{
+    const text = li.textContent;
+    ctxLegend.fillText(text, 10, (i+1)*itemHeight);
   });
+
+  const legendImg = legendCanvas.toDataURL('image/png');
+  const scaleLegend = Math.min((pdfWidth-2*margin)/legendCanvas.width, (pdfHeight-2*margin)/legendCanvas.height);
+  const legendWidth = legendCanvas.width*scaleLegend;
+  const legendHeight = legendCanvas.height*scaleLegend;
+  doc.addImage(legendImg,'PNG',(pdfWidth-legendWidth)/2,(pdfHeight-legendHeight)/2,legendWidth,legendHeight);
+
+  doc.save('Analysekarte.pdf');
 });
 
 /* Init */
@@ -574,3 +578,4 @@ updateLegend();
 </body>
 
 </html>
+
