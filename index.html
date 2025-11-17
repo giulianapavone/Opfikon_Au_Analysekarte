@@ -1,0 +1,507 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Opfikon Au, Analysekarte</title>
+<style>
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+
+  /* Desktop Version */
+  body {
+    display: flex;
+    flex-direction: row;
+    font-family: sans-serif;
+    background: #fff;
+    height: 100vh;
+    overflow: hidden;
+  }
+
+  /* Map container */
+  #main-column {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    overflow-y: auto;
+    background: #fff;
+    align-items: center;
+  }
+
+  #map-container {
+    position: relative;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+  }
+
+  #map-inner {
+    position: relative;
+    width: 100%;
+    min-width: 50%;
+    max-width: 200%;
+    transform-origin: center top;
+  }
+
+  .layer {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: auto;
+    display: none;
+  }
+
+  /* Layer order */
+  #Analysekarte-Glatt { z-index: 0; display: block; }
+  #Analysekarte-Bauzonen { z-index: 1; }
+  #Analysekarte-Strassenlaerm { z-index: 2; }
+  #Analysekarte-Eigentuemer { z-index: 3; }
+  #Analysekarte-Gebaeudealter { z-index: 4; }
+  #Analysekarte-Velowege { z-index: 5; }
+  #Analysekarte-Fusswege { z-index: 6; }
+  #Analysekarte-Fluglaerm { z-index: 7; }
+  #Analysekarte-Basekarte { z-index: 8; display: block; }
+  #Analysekarte-Unfaelle { z-index: 9; }
+  #Analysekarte-Fussgaengerstreifen { z-index: 10; }
+  #Analysekarte-Busstationen { z-index: 11; }
+
+  /* Sidebar */
+  #sidebar {
+    width: 240px;
+    display: flex;
+    flex-direction: column;
+    background: #fff;
+    padding: 4px;
+    border-left: 1px solid #ddd;
+    position: relative;
+  }
+
+  /* Button design */
+  button {
+    display: block;
+    width: 100%;
+    margin-bottom: 2px;
+    padding: 2px;
+    border: none;
+    border-radius: 4px;
+    background-color: #ccc;
+    cursor: pointer;
+    font-size: 14px;
+    transition: background-color 0.2s;
+  }
+
+  button:hover { background-color: #bbb; }
+  button.active { background-color: #1976D2; color: white; }
+
+  /* Zoom controls */
+  #zoom-controls {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 2px;
+    width: 100%;
+  }
+
+  #zoom-controls button {
+   font-size: 12px;
+  }
+
+  /* Layer buttons */
+  #buttons { }
+
+  /* Legend */
+  #legend-container {
+    flex: 1;
+    overflow-y: auto;
+    margin-top: 4px;
+  }
+
+  #legend-title {
+    position: sticky;
+    top: 0;
+    background: #fff;
+    z-index: 12;
+    display: none;
+    font-weight: bold;
+  }
+
+  #legend-list { 
+   list-style: none;
+  }
+
+  #legend-list li {
+    margin: 2px 0;
+    display: flex;
+    align-items: center;
+    font-size: 14px;
+  }
+
+  #legend-list li span {
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    margin-right: 5px;
+    vertical-align: middle;
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+  }
+
+  #legend-list li img {
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    object-fit: contain;
+    margin-right: 5px;
+    vertical-align: middle;
+  }
+
+  /* Quellen & Export */
+  #source-tab {
+   position: absolute;
+   bottom: 0;
+   left: 4px;
+   right: 4px; 
+   text-align: center;
+   font-size: 11px;
+   color: #555;
+   background-color: rgba(255, 255, 255, 0.2);
+   backdrop-filter: blur(2px);
+   display: flex;
+   flex-direction: column;
+   align-items: center;
+  }
+
+  #source-tab button {
+   margin-top: 2px;
+   margin-bottom: 4px;
+   font-size: 12px;
+   width: 100%;
+   color: #555;
+   background-color: rgba(153, 153, 153, 0.2);
+   border: 1px solid #888;
+  }
+ 
+  #source-tab button:hover {
+    background-color: rgba(153, 153, 153, 0.5);
+  }
+
+  /* Mobile styles */
+  @media (max-width: 480px) {
+    body {
+      flex-direction: column;
+      height: auto;
+      overflow-y: auto;
+    }
+    
+    #main-column {
+      overflow-y: visible;
+      height: auto;
+    }
+    
+    #map-container {
+      width: 100%;
+      height: calc(100vw * 2321 / 1834);
+    }
+    
+    #map-inner {
+      width: 100%;
+      height: 100%;
+      transform: none !important;
+      position: relative;
+    }
+    
+    #sidebar {
+      width: 100%;
+    }
+
+    #zoom-controls {
+      display: none;
+    }
+   
+  }
+ 
+</style>
+</head>
+<body>
+
+<!-- Map -->
+<div id="main-column">
+  <div id="map-container">
+    <div id="map-inner">
+      <img src="Analysekarte-Basekarte.png" class="layer" id="Analysekarte-Basekarte" alt="Basekarte">
+      <img src="Analysekarte-Bauzonen.png" class="layer" id="Analysekarte-Bauzonen" alt="Bauzonen">
+      <img src="Analysekarte-Strassenlaerm.png" class="layer" id="Analysekarte-Strassenlaerm" alt="Strassenlärm">
+      <img src="Analysekarte-Glatt.png" class="layer" id="Analysekarte-Glatt" alt="Glatt">
+      <img src="Analysekarte-Gebaeudealter.png" class="layer" id="Analysekarte-Gebaeudealter" alt="Gebäudealter">
+      <img src="Analysekarte-Fusswege.png" class="layer" id="Analysekarte-Fusswege" alt="Fusswege">
+      <img src="Analysekarte-Velowege.png" class="layer" id="Analysekarte-Velowege" alt="Velowege">
+      <img src="Analysekarte-Fluglaerm.png" class="layer" id="Analysekarte-Fluglaerm" alt="Fluglärm">
+      <img src="Analysekarte-Unfaelle.png" class="layer" id="Analysekarte-Unfaelle" alt="Unfälle">
+      <img src="Analysekarte-Fussgaengerstreifen.png" class="layer" id="Analysekarte-Fussgaengerstreifen" alt="Fussgängerstreifen">
+      <img src="Analysekarte-Busstationen.png" class="layer" id="Analysekarte-Busstationen" alt="Busstationen">
+      <img src="Analysekarte-Eigentuemer.png" class="layer" id="Analysekarte-Eigentuemer" alt="Eigentümer">
+    </div>
+  </div>
+</div>
+
+<!-- Sidebar - everything stays in sidebar -->
+<div id="sidebar">
+  <!-- Zoom controls -->
+  <div id="zoom-controls">
+    <button onclick="zoomMap(-10)">-10%</button>
+    <button onclick="zoomMap(-5)">-5%</button>
+    <button id="zoom-default" onclick="zoomDefault()">100%</button>
+    <button onclick="zoomMap(5)">+5%</button>
+    <button onclick="zoomMap(10)">+10%</button>
+  </div>
+
+  <!-- Layer buttons -->
+  <div id="buttons">
+    <button onclick="toggleLayer('Analysekarte-Bauzonen', this)">Bauzonen</button>
+    <button onclick="toggleLayer('Analysekarte-Gebaeudealter', this)">Gebäudealter</button>
+    <button onclick="toggleLayer('Analysekarte-Eigentuemer', this)">Grundeigentümer</button>
+    <button onclick="toggleLayer('Analysekarte-Fusswege', this)">Fusswege</button>
+    <button onclick="toggleLayer('Analysekarte-Fussgaengerstreifen', this)">Fussgängerstreifen</button>
+    <button onclick="toggleLayer('Analysekarte-Velowege', this)">Velowege</button>
+    <button onclick="toggleLayer('Analysekarte-Busstationen', this)">Busstationen</button>
+    <button onclick="toggleLayer('Analysekarte-Unfaelle', this)">Unfälle</button>
+    <button onclick="toggleLayer('Analysekarte-Strassenlaerm', this)">Strassenlärm</button>
+    <button onclick="toggleLayer('Analysekarte-Fluglaerm', this)">Fluglärm</button>
+  </div>
+
+  <!-- Legend -->
+  <div id="legend-container">
+    <div id="legend-title">Legende</div>
+    <ul id="legend-list"></ul>
+  </div>
+
+  <!-- Quellen & Export - inside sidebar at bottom -->
+  <div id="source-tab">
+    <div>Quellen: GIS-ZH, Swisstopo & Google Maps</div>
+    <button onclick="exportVisibleLayers()">Exportieren</button>
+  </div>
+</div>
+
+<script>
+let zoom = 100;
+
+/* Zoom */
+function updateZoomDisplay() {
+  document.getElementById('zoom-default').textContent = zoom + '%';
+}
+
+function zoomMap(change) {
+  zoom += change;
+  if (zoom < 50) zoom = 50;
+  if (zoom > 200) zoom = 200;
+  document.getElementById('map-inner').style.transform = `scale(${zoom / 100})`;
+  updateZoomDisplay();
+}
+
+function zoomDefault() {
+  zoom = 100;
+  document.getElementById('map-inner').style.transform = 'scale(1)';
+  updateZoomDisplay();
+}
+
+/* Layer toggle */
+function toggleLayer(id, button) {
+  const el = document.getElementById(id);
+
+  // Special Group: only oneat the same time
+  const exclusiveLayers = ["Analysekarte-Eigentuemer", "Analysekarte-Bauzonen", "Analysekarte-Strassenlaerm"];
+
+  if (exclusiveLayers.includes(id)) {
+    // Deaktivate all other
+    exclusiveLayers.forEach(layerId => {
+      if (layerId !== id) {
+        const otherLayer = document.getElementById(layerId);
+        const otherButton = Array.from(document.querySelectorAll('#buttons button'))
+          .find(b => b.getAttribute('onclick')?.includes(layerId));
+        if (otherLayer.style.display === 'block') {
+          otherLayer.style.display = 'none';
+          otherButton?.classList.remove('active');
+        }
+      }
+    });
+  }
+
+  // Standard Toggle
+  if (el.style.display === 'block') {
+    el.style.display = 'none';
+    button.classList.remove('active');
+  } else {
+    el.style.display = 'block';
+    button.classList.add('active');
+  }
+
+  updateLegend();
+}
+
+/* Export */
+async function exportVisibleLayers() {
+  const mapInner = document.getElementById('map-inner');
+  const allLayers = Array.from(mapInner.querySelectorAll('.layer'));
+  const visibleLayers = allLayers.filter(l => l.style.display === 'block');
+  
+  visibleLayers.sort((a, b) => (parseInt(getComputedStyle(a).zIndex) || 0) - (parseInt(getComputedStyle(b).zIndex) || 0));
+
+  const ref = visibleLayers[0];
+  const width = ref.naturalWidth;
+  const height = ref.naturalHeight;
+
+  const canvas = document.createElement('canvas');
+  canvas.width = width;
+  canvas.height = height;
+  const ctx = canvas.getContext('2d');
+  ctx.fillStyle = 'white';
+  ctx.fillRect(0, 0, width, height);
+
+  for (const layer of visibleLayers) {
+    await new Promise((resolve, reject) => {
+      const img = new Image();
+      img.crossOrigin = 'anonymous';
+      img.onload = () => { ctx.drawImage(img, 0, 0, width, height); resolve(); };
+      img.onerror = reject;
+      img.src = layer.src;
+    });
+  }
+
+  const link = document.createElement('a');
+  link.download = 'Analysekarte_Export.png';
+  link.href = canvas.toDataURL('image/png');
+  link.click();
+}
+
+/* Layer Legendeninfos */
+const layerLegends = [
+  { title: "Bauzonen", layers: [{ id: "Analysekarte-Bauzonen", items: [
+    { label: "WG3", color: "#ffd4d0" },
+    { label: "W4", color: "#ffded0" },
+    { label: "W3", color: "#ffefd0" },
+    { label: "W2d", color: "#fff7d0" }
+  ]}]},
+  { title: "Baujahr", layers: [{ id: "Analysekarte-Gebaeudealter", items: [
+    { label: "1926-1950", color: "#ab3087" },
+    { label: "1951-1960", color: "#ec5689" },
+    { label: "1961-1970", color: "#f4737e" },
+    { label: "1971-1980", color: "#f5926e" },
+    { label: "1981-1990", color: "#edb066" },
+    { label: "1991-2000", color: "#e0cb6e" },
+    { label: "2001-2010", color: "#c8e17c" },
+    { label: "2011-heute", color: "#88e17c" }
+  ]}]},
+  { title: "Grundeigentümer", layers: [{ id: "Analysekarte-Eigentuemer", items: [
+    { label: "Stockwerkeigentum", color: "#999999" },
+    { label: "Ein Farbton pro Partie:", subtitle: true },
+    { label: "Genossenschaften", gradient: "linear-gradient(to right,#64b5f6,#1976d2)" },
+    { label: "Aktiengesellschaften", gradient: "linear-gradient(to right,#ffc1c1,#8b0000)" },
+    { label: "Private Eigentümer", gradient: "linear-gradient(to right,#d5f5e3,#0a3211)" }
+  ]}]},
+  { title: "Verkehr", layers: [
+    { id: "Analysekarte-Fusswege", items: [
+      { label: "Fussgängerzugängliche Wege", line: true, color: "#ee000b" },
+      { label: "fehlende Fusswege", stripes: true, color: "#ee000b" }
+    ]},
+    { id: "Analysekarte-Fussgaengerstreifen", items: [
+      { label: "Fussgängerstreifen", icon: "Fussgaengerstreifensymbol.png" }
+    ]},
+    { id: "Analysekarte-Velowege", items: [
+      { label: "Veloweg", line: true, color: "#000aee" }
+    ]},
+    { id: "Analysekarte-Busstationen", items: [
+      { label: "Bushaltestellen", icon: "Bushaltestellensymbol.png" }
+    ]},
+    { id: "Analysekarte-Unfaelle", items: [
+      { label: "Unfälle von 2011 bis 2025", icon: "Unfaellesymbol.png" }
+    ]}
+  ]},
+  { title: "Strassenlärm (06-22 Uhr)", layers: [{ id: "Analysekarte-Strassenlaerm", items: [
+    { label: ">= 75 dB(A)", color: "#787fab" },
+    { label: "70-74.9 dB(A)", color: "#bfadcc" },
+    { label: "65-69.9 dB(A)", color: "#aa6974" },
+    { label: "60-64.9 dB(A)", color: "#eb7878" },
+    { label: "55-59.9 dB(A)", color: "#ee966e" },
+    { label: "50-54.9 dB(A)", color: "#f9cc85" },
+    { label: "45-49.9 dB(A)", color: "#eee86e" },
+    { label: "40-44.9 dB(A)", color: "#677b64" }
+  ]}]},
+  { title: "Fluglärm", layers: [{ id: "Analysekarte-Fluglaerm", items: [
+    { label: "65 dB(A)", line: true, color: "#007d1d" }
+  ]}]}
+];
+
+/* Legende updaten */
+/* Platz für Quelle unten */
+function adjustLegendPadding() {
+  const source = document.getElementById('source-tab');
+  const legend = document.getElementById('legend-container');
+  legend.style.paddingBottom = source.offsetHeight + 'px';
+}
+function updateLegend() {
+  const legendList = document.getElementById('legend-list');
+  const legendTitle = document.getElementById('legend-title');
+  legendList.innerHTML = '';
+
+  layerLegends.forEach(group => {
+    const activeLayers = group.layers.filter(layer => document.getElementById(layer.id).style.display === 'block');
+    if (activeLayers.length > 0) {
+      const liGroup = document.createElement('li');
+      liGroup.innerHTML = `<strong>${group.title}</strong>`;
+      liGroup.style.marginTop = '6px';
+      liGroup.style.fontSize = '15px';
+      legendList.appendChild(liGroup);
+
+      activeLayers.forEach(layer => {
+        layer.items.forEach(item => {
+          if (item.subtitle) {
+            const liSub = document.createElement('li');
+            liSub.textContent = item.label;
+            liSub.style.fontWeight = 'bold';
+            liSub.style.fontSize = '13px';
+            legendList.appendChild(liSub);
+            return;
+          }
+
+          const li = document.createElement('li');
+          const symbol = document.createElement('span');
+
+          if (item.icon) {
+            symbol.style.backgroundImage = `url('${item.icon}')`;
+          } else if (item.line) {
+            symbol.style.backgroundImage = `linear-gradient(to right, ${item.color} 100%, transparent 0)`;
+            symbol.style.backgroundSize = '100% 4px';
+            symbol.style.backgroundPosition = 'center';
+            symbol.style.backgroundRepeat = 'no-repeat';
+          } else if (item.stripes) {
+            symbol.style.backgroundImage = `repeating-linear-gradient(to right, ${item.color} 0 2px, white 2px 4px)`;
+          } else if (item.gradient) {
+            symbol.style.backgroundImage = item.gradient;
+          } else if (item.color) {
+            symbol.style.backgroundColor = item.color;
+          }
+
+          li.appendChild(symbol);
+          li.appendChild(document.createTextNode(item.label));
+          legendList.appendChild(li);
+        });
+      });
+    }
+  });
+
+  legendTitle.style.display = legendList.children.length > 0 ? 'block' : 'none';
+  adjustLegendPadding();
+}
+
+/* Init */
+document.getElementById('Analysekarte-Basekarte').style.display = 'block';
+document.getElementById('Analysekarte-Glatt').style.display = 'block';
+updateZoomDisplay();
+updateLegend();
+</script>
+</body>
+</html>
