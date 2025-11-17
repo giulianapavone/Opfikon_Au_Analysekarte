@@ -500,17 +500,30 @@ async function exportVisibleLayers() {
 /* Export Legend */
 async function exportLegend() {
   const legend = document.getElementById('legend-container');
-  
-  // Temporarily expand legend height
-  const originalHeight = legend.style.height;
-  legend.style.height = 'auto';
+  const legendList = document.getElementById('legend-list');
 
-  const canvas = await html2canvas(legend, {
+  if (legendList.children.length === 0) {
+    alert("Keine Legendeninformationen zum Exportieren!");
+    return;
+  }
+
+  // Clone legend for export with small padding
+  const exportWrapper = legend.cloneNode(true);
+  exportWrapper.style.position = 'absolute';
+  exportWrapper.style.left = '-1000px'; // move offscreen
+  exportWrapper.style.top = '0';
+  exportWrapper.style.width = legend.offsetWidth + 4 + 'px'; // +2px left +2px right
+  exportWrapper.style.padding = '2px';
+  exportWrapper.style.height = 'auto';
+  exportWrapper.style.backgroundColor = 'white';
+  document.body.appendChild(exportWrapper);
+
+  const canvas = await html2canvas(exportWrapper, {
     backgroundColor: 'white',
     scale: 2
   });
 
-  legend.style.height = originalHeight; // restore
+  document.body.removeChild(exportWrapper);
 
   const link = document.createElement('a');
   link.download = 'Legende.png';
@@ -527,3 +540,4 @@ updateLegend();
 </body>
 
 </html>
+
