@@ -61,7 +61,7 @@
   #Analysekarte-Bauzonen { z-index: 1; }
   #Analysekarte-Beschaeftigtendichte { z-index: 2; }
   #Analysekarte-Einwohnerdichte { z-index: 3; }
-  #Analysekarte-Geschossflaechenreserve { z-index: 4; }
+  #Analysekarte-Geschossflaechenreserven { z-index: 4; }
   #Analysekarte-Strassenlaerm { z-index: 5; }
   #Analysekarte-Eigentuemer { z-index: 6; }
   #Analysekarte-Parkplatzflaechen { z-index: 7; }
@@ -241,7 +241,7 @@
       <img src="Analysekarte-Bauzonen.png" class="layer" id="Analysekarte-Bauzonen" alt="Bauzonen">
       <img src="Analysekarte-Beschaeftigtendichte.png" class="layer" id="Analysekarte-Beschaeftigtendichte" alt="Beschäftigtendichte">
       <img src="Analysekarte-Einwohnerdichte.png" class="layer" id="Analysekarte-Einwohnerdichte" alt="Einwohnerdichte">
-      <img src="Analysekarte-Geschossflaechenreserve.png" class="layer" id="Analysekarte-Geschossflaechenreserve" alt="Geschossflächenreserve">
+      <img src="Analysekarte-Geschossflaechenreserven.png" class="layer" id="Analysekarte-Geschossflaechenreserven" alt="Geschossflächenreserve">
       <img src="Analysekarte-Strassenlaerm.png" class="layer" id="Analysekarte-Strassenlaerm" alt="Strassenlärm">
       <img src="Analysekarte-Eigentuemer.png" class="layer" id="Analysekarte-Eigentuemer" alt="Eigentümer">
       <img src="Analysekarte-Parkplatzflaechen.png" class="layer" id="Analysekarte-Parkplatzflaechen" alt="Parkplatzflächen">
@@ -273,7 +273,7 @@
     <button onclick="toggleLayer('Analysekarte-Bauzonen', this)">Bauzonen</button>
     <button onclick="toggleLayer('Analysekarte-Gebaeudealter', this)">Gebäudealter</button>
     <button onclick="toggleLayer('Analysekarte-Eigentuemer', this)">Grundeigentümer</button>
-    <button onclick="toggleLayer('Analysekarte-Geschossflaechenreserve', this)">Geschossflächenreserve</button>
+    <button onclick="toggleLayer('Analysekarte-Geschossflaechenreserven', this)">Geschossflächenreserve</button>
     <button onclick="toggleLayer('Analysekarte-Einwohnerdichte', this)">Einwohnerdichte</button>
     <button onclick="toggleLayer('Analysekarte-Beschaeftigtendichte', this)">Beschäftigtendichte</button>
     <button onclick="toggleLayer('Analysekarte-Fusswege', this)">Fusswege</button>
@@ -327,7 +327,7 @@ function toggleLayer(id, button) {
   const el = document.getElementById(id);
 
   // Special Group: only oneat the same time
-  const exclusiveLayers = ["Analysekarte-Eigentuemer", "Analysekarte-Bauzonen", "Analysekarte-Strassenlaerm", "Analysekarte-Einwohnerdichte", "Analysekarte-Beschaeftigtendichte"];
+  const exclusiveLayers = ["Analysekarte-Eigentuemer", "Analysekarte-Bauzonen", "Analysekarte-Strassenlaerm", "Analysekarte-Einwohnerdichte", "Analysekarte-Beschaeftigtendichte", "Analysekarte-Geschossflaechenreserven"];
 
   if (exclusiveLayers.includes(id)) {
     // Deaktivate all other
@@ -380,7 +380,7 @@ const layerLegends = [
     { label: "Private Eigentümer", color: "#ee9898" },
     { label: "Stockwerkeigentum", color: "#f0ae90" }
   ]}]},
-  { title: "Geschossflächenreserven (in m^2)", layers: [{ id: "Analysekarte-Geschossflaechenreserve", items: [
+  { title: "Geschossflächenreserven (in m^2)", layers: [{ id: "Analysekarte-Geschossflaechenreserven", items: [
     { label: "bis 1000", color: "#f7c3bc" },
     { label: "1000-2500", color: "#f59688" },
     { label: "2500-5000", color: "#eb6957" },
@@ -588,5 +588,6 @@ updateLegend();
 </body>
 
 </html>
+
 
 
