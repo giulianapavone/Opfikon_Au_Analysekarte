@@ -282,6 +282,7 @@
     <button onclick="toggleLayer('Analysekarte-Velowege', this)">Velowege</button>
     <button onclick="toggleLayer('Analysekarte-Busstationen', this)">Busstationen</button>
     <button onclick="toggleLayer('Analysekarte-Unfaelle', this)">Unfälle</button>
+    <button onclick="toggleLayer('Analysekarte-Parkplatzflaechen', this)">Parkplatzflächen</button>
     <button onclick="toggleLayer('Analysekarte-Strassenlaerm', this)">Strassenlärm</button>
     <button onclick="toggleLayer('Analysekarte-Fluglaerm', this)">Fluglärm</button>
   </div>
@@ -412,6 +413,9 @@ const layerLegends = [
     ]},
     { id: "Analysekarte-Unfaelle", items: [
       { label: "Unfälle von 2011 bis 2025", icon: "Unfaellesymbol.png" }
+    ]},
+    { id: "Analysekarte-Parkplatzflaechen", items: [
+      { label: "Parkplatzflächen", color: "#ffed06" }
     ]}
   ]},
   { title: "Strassenlärm (06-22 Uhr)", layers: [{ id: "Analysekarte-Strassenlaerm", items: [
@@ -585,3 +589,4 @@ updateLegend();
 </body>
 
 </html>
+
