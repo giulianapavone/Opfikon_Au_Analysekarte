@@ -276,7 +276,6 @@
     <button onclick="toggleLayer('Analysekarte-Geschossflaechenreserve', this)">Geschossflächenreserve</button>
     <button onclick="toggleLayer('Analysekarte-Einwohnerdichte', this)">Einwohnerdichte</button>
     <button onclick="toggleLayer('Analysekarte-Beschaeftigtendichte', this)">Beschäftigtendichte</button>
-    <button onclick="toggleLayer('Analysekarte-Geschossflaechenreserve', this)">Geschossflächenreserve</button>
     <button onclick="toggleLayer('Analysekarte-Fusswege', this)">Fusswege</button>
     <button onclick="toggleLayer('Analysekarte-Fussgaengerstreifen', this)">Fussgängerstreifen</button>
     <button onclick="toggleLayer('Analysekarte-Velowege', this)">Velowege</button>
@@ -381,11 +380,11 @@ const layerLegends = [
     { label: "Private Eigentümer", color: "#ee9898" },
     { label: "Stockwerkeigentum", color: "#f0ae90" }
   ]}]},
-  { title: "Geschossflächenreserven (in m^2)", layers: [{ id: "Analysekarte-Geschossflaechenreserven", items: [
+  { title: "Geschossflächenreserven (in m^2)", layers: [{ id: "Analysekarte-Geschossflaechenreserve", items: [
     { label: "bis 1000", color: "#f7c3bc" },
     { label: "1000-2500", color: "#f59688" },
     { label: "2500-5000", color: "#eb6957" },
-    { label: "500-7500", color: "#ad3321" },
+    { label: "5000-7500", color: "#ad3321" },
     { label: "7500+", color: "#841c07" }
   ]}]},
   { title: "Einwohnerdichte (Personen/Hektare)", layers: [{ id: "Analysekarte-Einwohnerdichte", items: [
@@ -589,4 +588,5 @@ updateLegend();
 </body>
 
 </html>
+
 
