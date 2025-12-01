@@ -273,7 +273,7 @@
     <button onclick="toggleLayer('Analysekarte-Bauzonen', this)">Bauzonen</button>
     <button onclick="toggleLayer('Analysekarte-Gebaeudealter', this)">Gebäudealter</button>
     <button onclick="toggleLayer('Analysekarte-Eigentuemer', this)">Grundeigentümer</button>
-    <button onclick="toggleLayer('Analysekarte-Geschossflaechenreserven', this)">Geschossflächenreserve</button>
+    <button onclick="toggleLayer('Analysekarte-Geschossflaechenreserven', this)">Geschossflächenreserven</button>
     <button onclick="toggleLayer('Analysekarte-Einwohnerdichte', this)">Einwohnerdichte</button>
     <button onclick="toggleLayer('Analysekarte-Beschaeftigtendichte', this)">Beschäftigtendichte</button>
     <button onclick="toggleLayer('Analysekarte-Fusswege', this)">Fusswege</button>
@@ -364,7 +364,7 @@ const layerLegends = [
     { label: "W3", color: "#ee9898" },
     { label: "W2d", color: "#f0ae90" }
   ]}]},
-  { title: "Baujahr", layers: [{ id: "Analysekarte-Gebaeudealter", items: [
+  { title: "Baujahre", layers: [{ id: "Analysekarte-Gebaeudealter", items: [
     { label: "1926-1950", color: "#9a1025" },
     { label: "1951-1960", color: "#d13b52" },
     { label: "1961-1970", color: "#c45a6a" },
@@ -380,22 +380,22 @@ const layerLegends = [
     { label: "Private Eigentümer", color: "#ee9898" },
     { label: "Stockwerkeigentum", color: "#f0ae90" }
   ]}]},
-  { title: "Geschossflächenreserven (in m^2)", layers: [{ id: "Analysekarte-Geschossflaechenreserven", items: [
-    { label: "bis 1000", color: "#f7c3bc" },
-    { label: "1000-2500", color: "#f59688" },
-    { label: "2500-5000", color: "#eb6957" },
-    { label: "5000-7500", color: "#ad3321" },
-    { label: "7500+", color: "#841c07" }
+  { title: "Geschossflächenreserven", layers: [{ id: "Analysekarte-Geschossflaechenreserven", items: [
+    { label: "bis 1000 m<sup>2</sup>", color: "#f7c3bc" },
+    { label: "1000-2500 m<sup>2</sup>", color: "#f59688" },
+    { label: "2500-5000 m<sup>2</sup>", color: "#eb6957" },
+    { label: "5000- m<sup>2</sup>", color: "#ad3321" },
+    { label: "7500+ m<sup>2</sup>", color: "#841c07" }
   ]}]},
-  { title: "Einwohnerdichte (Personen/Hektare)", layers: [{ id: "Analysekarte-Einwohnerdichte", items: [
-    { label: "bis 75", color: "#f59688" },
-    { label: "75-125", color: "#eb6957" },
-    { label: "125-175", color: "#ad3321" },
-    { label: "175+", color: "#841c07" }
+  { title: "Einwohnerdichte", layers: [{ id: "Analysekarte-Einwohnerdichte", items: [
+    { label: "bis 75 Personen/Hektar", color: "#f59688" },
+    { label: "75-125 Personen/Hektar", color: "#eb6957" },
+    { label: "125-175 Personen/Hektar", color: "#ad3321" },
+    { label: "175+ Personen/Hektar", color: "#841c07" }
   ]}]},
-  { title: "Beschäftigtendichte (Personen/Hektare)", layers: [{ id: "Analysekarte-Beschaeftigtendichte", items: [
-    { label: "bis 25", color: "#f7c3bc" },
-    { label: "125-175", color: "#ad3321" }
+  { title: "Beschäftigtendichte", layers: [{ id: "Analysekarte-Beschaeftigtendichte", items: [
+    { label: "bis 25 Personen/Hektar", color: "#f7c3bc" },
+    { label: "125-175 Personen/Hektar", color: "#ad3321" }
   ]}]},
   { title: "Verkehr", layers: [
     { id: "Analysekarte-Fusswege", items: [
@@ -588,6 +588,7 @@ updateLegend();
 </body>
 
 </html>
+
 
 
 
