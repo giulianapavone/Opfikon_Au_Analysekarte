@@ -59,16 +59,20 @@
   /* Layer order */
   #Analysekarte-Glatt { z-index: 0; display: block; }
   #Analysekarte-Bauzonen { z-index: 1; }
-  #Analysekarte-Strassenlaerm { z-index: 2; }
-  #Analysekarte-Eigentuemer { z-index: 3; }
-  #Analysekarte-Gebaeudealter { z-index: 4; }
-  #Analysekarte-Velowege { z-index: 5; }
-  #Analysekarte-Fusswege { z-index: 6; }
-  #Analysekarte-Fluglaerm { z-index: 7; }
-  #Analysekarte-Basekarte { z-index: 8; display: block; }
-  #Analysekarte-Unfaelle { z-index: 9; }
-  #Analysekarte-Fussgaengerstreifen { z-index: 10; }
-  #Analysekarte-Busstationen { z-index: 11; }
+  #Analysekarte-Beschaeftigtendichte { z-index: 2; }
+  #Analysekarte-Einwohnerdichte { z-index: 3; }
+  #Analysekarte-Geschossflaechenreserve { z-index: 4; }
+  #Analysekarte-Strassenlaerm { z-index: 5; }
+  #Analysekarte-Eigentuemer { z-index: 6; }
+  #Analysekarte-Parkplatzflaechen { z-index: 7; }
+  #Analysekarte-Gebaeudealter { z-index: 8; }
+  #Analysekarte-Velowege { z-index: 9; }
+  #Analysekarte-Fusswege { z-index: 10; }
+  #Analysekarte-Fluglaerm { z-index: 11; }
+  #Analysekarte-Basekarte { z-index: 12; display: block; }
+  #Analysekarte-Unfaelle { z-index: 13; }
+  #Analysekarte-Fussgaengerstreifen { z-index: 14; }
+  #Analysekarte-Busstationen { z-index: 15; }
 
   /* Sidebar */
   #sidebar {
@@ -233,18 +237,22 @@
 <div id="main-column">
   <div id="map-container">
     <div id="map-inner">
-      <img src="Analysekarte-Basekarte.png" class="layer" id="Analysekarte-Basekarte" alt="Basekarte">
-      <img src="Analysekarte-Bauzonen.png" class="layer" id="Analysekarte-Bauzonen" alt="Bauzonen">
-      <img src="Analysekarte-Strassenlaerm.png" class="layer" id="Analysekarte-Strassenlaerm" alt="Strassenlärm">
       <img src="Analysekarte-Glatt.png" class="layer" id="Analysekarte-Glatt" alt="Glatt">
+      <img src="Analysekarte-Bauzonen.png" class="layer" id="Analysekarte-Bauzonen" alt="Bauzonen">
+      <img src="Analysekarte-Beschaeftigtendichte.png" class="layer" id="Analysekarte-Beschaeftigtendichte" alt="Beschäftigtendichte">
+      <img src="Analysekarte-Einwohnerdichte.png" class="layer" id="Analysekarte-Einwohnerdichte" alt="Einwohnerdichte">
+      <img src="Analysekarte-Geschossflaechenreserve.png" class="layer" id="Analysekarte-Geschossflaechenreserve" alt="Geschossflächenreserve">
+      <img src="Analysekarte-Strassenlaerm.png" class="layer" id="Analysekarte-Strassenlaerm" alt="Strassenlärm">
+      <img src="Analysekarte-Eigentuemer.png" class="layer" id="Analysekarte-Eigentuemer" alt="Eigentümer">
+      <img src="Analysekarte-Parkplatzflaechen.png" class="layer" id="Analysekarte-Parkplatzflaechen" alt="Parkplatzflächen">
       <img src="Analysekarte-Gebaeudealter.png" class="layer" id="Analysekarte-Gebaeudealter" alt="Gebäudealter">
-      <img src="Analysekarte-Fusswege.png" class="layer" id="Analysekarte-Fusswege" alt="Fusswege">
       <img src="Analysekarte-Velowege.png" class="layer" id="Analysekarte-Velowege" alt="Velowege">
+      <img src="Analysekarte-Fusswege.png" class="layer" id="Analysekarte-Fusswege" alt="Fusswege">
       <img src="Analysekarte-Fluglaerm.png" class="layer" id="Analysekarte-Fluglaerm" alt="Fluglärm">
+      <img src="Analysekarte-Basekarte.png" class="layer" id="Analysekarte-Basekarte" alt="Basekarte">
       <img src="Analysekarte-Unfaelle.png" class="layer" id="Analysekarte-Unfaelle" alt="Unfälle">
       <img src="Analysekarte-Fussgaengerstreifen.png" class="layer" id="Analysekarte-Fussgaengerstreifen" alt="Fussgängerstreifen">
       <img src="Analysekarte-Busstationen.png" class="layer" id="Analysekarte-Busstationen" alt="Busstationen">
-      <img src="Analysekarte-Eigentuemer.png" class="layer" id="Analysekarte-Eigentuemer" alt="Eigentümer">
     </div>
   </div>
 </div>
@@ -265,6 +273,10 @@
     <button onclick="toggleLayer('Analysekarte-Bauzonen', this)">Bauzonen</button>
     <button onclick="toggleLayer('Analysekarte-Gebaeudealter', this)">Gebäudealter</button>
     <button onclick="toggleLayer('Analysekarte-Eigentuemer', this)">Grundeigentümer</button>
+    <button onclick="toggleLayer('Analysekarte-Geschossflaechenreserve', this)">Geschossflächenreserve</button>
+    <button onclick="toggleLayer('Analysekarte-Einwohnerdichte', this)">Einwohnerdichte</button>
+    <button onclick="toggleLayer('Analysekarte-Beschaeftigtendichte', this)">Beschäftigtendichte</button>
+    <button onclick="toggleLayer('Analysekarte-Geschossflaechenreserve', this)">Geschossflächenreserve</button>
     <button onclick="toggleLayer('Analysekarte-Fusswege', this)">Fusswege</button>
     <button onclick="toggleLayer('Analysekarte-Fussgaengerstreifen', this)">Fussgängerstreifen</button>
     <button onclick="toggleLayer('Analysekarte-Velowege', this)">Velowege</button>
@@ -273,7 +285,7 @@
     <button onclick="toggleLayer('Analysekarte-Strassenlaerm', this)">Strassenlärm</button>
     <button onclick="toggleLayer('Analysekarte-Fluglaerm', this)">Fluglärm</button>
   </div>
-
+ 
   <!-- Legend -->
   <div id="legend-container">
     <div id="legend-title">Legende</div>
@@ -315,7 +327,7 @@ function toggleLayer(id, button) {
   const el = document.getElementById(id);
 
   // Special Group: only oneat the same time
-  const exclusiveLayers = ["Analysekarte-Eigentuemer", "Analysekarte-Bauzonen", "Analysekarte-Strassenlaerm"];
+  const exclusiveLayers = ["Analysekarte-Eigentuemer", "Analysekarte-Bauzonen", "Analysekarte-Strassenlaerm", "Analysekarte-Einwohnerdichte", "Analysekarte-Beschaeftigtendichte"];
 
   if (exclusiveLayers.includes(id)) {
     // Deaktivate all other
@@ -367,6 +379,23 @@ const layerLegends = [
     { label: "Aktiengesellschaften", color: "#bd8d95" },
     { label: "Private Eigentümer", color: "#ee9898" },
     { label: "Stockwerkeigentum", color: "#f0ae90" }
+  ]}]},
+  { title: "Geschossflächenreserven (in m^2)", layers: [{ id: "Analysekarte-Geschossflaechenreserven", items: [
+    { label: "bis 1000", color: "#f7c3bc" },
+    { label: "1000-2500", color: "#f59688" },
+    { label: "2500-5000", color: "#eb6957" },
+    { label: "500-7500", color: "#ad3321" },
+    { label: "7500+", color: "#841c07" }
+  ]}]},
+  { title: "Einwohnerdichte (Personen/Hektare)", layers: [{ id: "Analysekarte-Einwohnerdichte", items: [
+    { label: "bis 75", color: "#f59688" },
+    { label: "75-125", color: "#eb6957" },
+    { label: "125-175", color: "#ad3321" },
+    { label: "175+", color: "#841c07" }
+  ]}]},
+  { title: "Beschäftigtendichte (Personen/Hektare)", layers: [{ id: "Analysekarte-Beschaeftigtendichte", items: [
+    { label: "bis 25", color: "#f7c3bc" },
+    { label: "125-175", color: "#ad3321" }
   ]}]},
   { title: "Verkehr", layers: [
     { id: "Analysekarte-Fusswege", items: [
