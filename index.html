@@ -194,6 +194,61 @@
     background-color: rgba(153, 153, 153, 0.5);
   }
 
+  /* Layer folders (collapsible details/summary) */
+  #buttons details {
+      margin-bottom: 2px;      /* half the previous distance between folders */
+      border-radius: 4px;      /* rounded corners for folder block */
+      overflow: hidden;        /* ensures child buttons stay inside rounded corners */
+      background-color: #ccc;  /* same grey as buttons */
+  }
+  
+  #buttons details summary {
+      display: flex;
+      align-items: center;
+      width: 100%;
+      padding: 2px 4px;        /* space for arrow */
+      font-size: 14px;
+      cursor: pointer;
+      transition: background-color 0.2s;
+      background-color: inherit; /* inherit folder bg */
+  }
+  
+  #buttons details summary::before {
+      content: "▶";
+      display: inline-block;
+      margin-right: 6px;
+      transition: transform 0.2s;
+  }
+  
+  #buttons details[open] summary::before {
+      transform: rotate(90deg);
+  }
+  
+  #buttons details summary:hover {
+      background-color: #bbb;
+  }
+ 
+  #buttons details button {
+      margin: 2px 4px;           /* spacing inside folder */
+      border-radius: 4px;        /* rounded corners */
+      width: calc(100% - 8px);   /* account for margin */
+      background-color: #ccc;    /* same grey as main buttons */
+      color: #000;
+      border: none;
+      cursor: pointer;
+      font-size: 14px;
+      transition: background-color 0.2s, color 0.2s;
+  }
+  
+  #buttons details button:hover {
+      background-color: #bbb;    /* slightly darker on hover */
+  }
+  
+  #buttons details button.active {
+      background-color: #1976D2; /* blue when active */
+      color: white;
+  }
+ 
   /* Mobile styles */
   @media (max-width: 600px) {
     body {
@@ -270,22 +325,39 @@
 
   <!-- Layer buttons -->
   <div id="buttons">
-    <button onclick="toggleLayer('Analysekarte-Bauzonen', this)">Bauzonen</button>
-    <button onclick="toggleLayer('Analysekarte-Gebaeudealter', this)">Gebäudealter</button>
-    <button onclick="toggleLayer('Analysekarte-Eigentuemer', this)">Grundeigentümer</button>
-    <button onclick="toggleLayer('Analysekarte-Geschossflaechenreserven', this)">Geschossflächenreserven</button>
-    <button onclick="toggleLayer('Analysekarte-Einwohnerdichte', this)">Einwohnerdichte</button>
-    <button onclick="toggleLayer('Analysekarte-Beschaeftigtendichte', this)">Beschäftigtendichte</button>
-    <button onclick="toggleLayer('Analysekarte-Fusswege', this)">Fusswege</button>
-    <button onclick="toggleLayer('Analysekarte-Fussgaengerstreifen', this)">Fussgängerstreifen</button>
-    <button onclick="toggleLayer('Analysekarte-Velowege', this)">Velowege</button>
-    <button onclick="toggleLayer('Analysekarte-Busstationen', this)">Busstationen</button>
-    <button onclick="toggleLayer('Analysekarte-Unfaelle', this)">Unfälle</button>
-    <button onclick="toggleLayer('Analysekarte-Parkplatzflaechen', this)">Parkplatzflächen</button>
-    <button onclick="toggleLayer('Analysekarte-Strassenlaerm', this)">Strassenlärm</button>
-    <button onclick="toggleLayer('Analysekarte-Fluglaerm', this)">Fluglärm</button>
+    <button onclick="clearLayers()">Alle Layers zurücksetzen</button>
+  
+    <details>
+      <summary>Siedlung</summary>
+      <button onclick="toggleLayer('Analysekarte-Bauzonen', this)">Bauzonen</button>
+      <button onclick="toggleLayer('Analysekarte-Gebaeudealter', this)">Gebäudealter</button>
+      <button onclick="toggleLayer('Analysekarte-Eigentuemer', this)">Grundeigentümer</button>
+      <button onclick="toggleLayer('Analysekarte-Geschossflaechenreserven', this)">Geschossflächenreserven</button>
+    </details>
+  
+    <details>
+      <summary>Bevölkerung</summary>
+      <button onclick="toggleLayer('Analysekarte-Einwohnerdichte', this)">Einwohnerdichte</button>
+      <button onclick="toggleLayer('Analysekarte-Beschaeftigtendichte', this)">Beschäftigtendichte</button>
+    </details>
+  
+    <details>
+      <summary>Verkehr</summary>
+      <button onclick="toggleLayer('Analysekarte-Fusswege', this)">Fusswege</button>
+      <button onclick="toggleLayer('Analysekarte-Fussgaengerstreifen', this)">Fussgängerstreifen</button>
+      <button onclick="toggleLayer('Analysekarte-Velowege', this)">Velowege</button>
+      <button onclick="toggleLayer('Analysekarte-Busstationen', this)">Busstationen</button>
+      <button onclick="toggleLayer('Analysekarte-Unfaelle', this)">Unfälle</button>
+      <button onclick="toggleLayer('Analysekarte-Parkplatzflaechen', this)">Parkplatzflächen</button>
+    </details>
+  
+    <details>
+      <summary>Lärm</summary>
+      <button onclick="toggleLayer('Analysekarte-Strassenlaerm', this)">Strassenlärm</button>
+      <button onclick="toggleLayer('Analysekarte-Fluglaerm', this)">Fluglärm</button>
+    </details>
   </div>
- 
+
   <!-- Legend -->
   <div id="legend-container">
     <div id="legend-title">Legende</div>
@@ -303,7 +375,7 @@
 <script>
 let zoom = 100;
 
-/* Zoom */
+/* --- Zoom --- */
 function updateZoomDisplay() {
   document.getElementById('zoom-default').textContent = zoom + '%';
 }
@@ -314,23 +386,57 @@ function zoomMap(change) {
   if (zoom > 200) zoom = 200;
   document.getElementById('map-inner').style.transform = `scale(${zoom / 100})`;
   updateZoomDisplay();
+  saveZoom();
 }
 
 function zoomDefault() {
   zoom = 100;
   document.getElementById('map-inner').style.transform = 'scale(1)';
   updateZoomDisplay();
+  saveZoom();
 }
 
-/* Layer toggle */
+function saveZoom() {
+  localStorage.setItem('mapZoom', zoom);
+}
+
+function restoreZoom() {
+  const savedZoom = localStorage.getItem('mapZoom');
+  if (savedZoom) {
+    zoom = parseInt(savedZoom);
+    document.getElementById('map-inner').style.transform = `scale(${zoom / 100})`;
+    updateZoomDisplay();
+  }
+}
+
+/* --- Layer --- */
+function clearLayers() {
+  const buttons = document.querySelectorAll('#buttons button');
+  buttons.forEach(btn => {
+    if (btn.onclick && btn.onclick.toString().includes('toggleLayer')) {
+      const idMatch = btn.getAttribute('onclick').match(/'([^']+)'/);
+      if (idMatch) {
+        const layer = document.getElementById(idMatch[1]);
+        layer.style.display = 'none';
+        btn.classList.remove('active');
+      }
+    }
+  });
+
+  const folders = document.querySelectorAll('#buttons details');
+  folders.forEach(folder => folder.open = false);
+
+  updateLegend();
+  saveLayers();
+  saveFolders();
+}
+
 function toggleLayer(id, button) {
   const el = document.getElementById(id);
 
-  // Special Group: only oneat the same time
   const exclusiveLayers = ["Analysekarte-Eigentuemer", "Analysekarte-Bauzonen", "Analysekarte-Strassenlaerm", "Analysekarte-Einwohnerdichte", "Analysekarte-Beschaeftigtendichte", "Analysekarte-Geschossflaechenreserven"];
 
   if (exclusiveLayers.includes(id)) {
-    // Deaktivate all other
     exclusiveLayers.forEach(layerId => {
       if (layerId !== id) {
         const otherLayer = document.getElementById(layerId);
@@ -344,7 +450,6 @@ function toggleLayer(id, button) {
     });
   }
 
-  // Standard Toggle
   if (el.style.display === 'block') {
     el.style.display = 'none';
     button.classList.remove('active');
@@ -354,9 +459,54 @@ function toggleLayer(id, button) {
   }
 
   updateLegend();
+  saveLayers();
 }
 
-/* Layer Legendeninfos */
+/* --- Speichern / Wiederherstellen der Layer --- */
+function saveLayers() {
+  const activeLayers = Array.from(document.querySelectorAll('#buttons button.active'))
+    .map(btn => btn.getAttribute('onclick').match(/'([^']+)'/)[1]);
+  localStorage.setItem('activeLayers', JSON.stringify(activeLayers));
+}
+
+function restoreLayers() {
+  const activeLayers = JSON.parse(localStorage.getItem('activeLayers') || '[]');
+  activeLayers.forEach(id => {
+    const layer = document.getElementById(id);
+    const button = Array.from(document.querySelectorAll('#buttons button'))
+      .find(btn => btn.getAttribute('onclick')?.includes(id));
+    if (layer && button) {
+      layer.style.display = 'block';
+      button.classList.add('active');
+    }
+  });
+  updateLegend();
+}
+
+/* --- Speichern / Wiederherstellen der offenen Sidebar-Folders --- */
+function saveFolders() {
+  const openFolders = Array.from(document.querySelectorAll('#buttons details'))
+    .filter(d => d.open)
+    .map(d => d.querySelector('summary').textContent.trim());
+  localStorage.setItem('openFolders', JSON.stringify(openFolders));
+}
+
+function restoreFolders() {
+  const openFolders = JSON.parse(localStorage.getItem('openFolders') || '[]');
+  document.querySelectorAll('#buttons details').forEach(folder => {
+    const title = folder.querySelector('summary').textContent.trim();
+    folder.open = openFolders.includes(title);
+  });
+}
+
+/* Folder-Status speichern bei Klick */
+document.querySelectorAll('#buttons details summary').forEach(summary => {
+  summary.addEventListener('click', () => {
+    setTimeout(saveFolders, 50); // speichern nach Toggle
+  });
+});
+
+/* --- Layer Legendeninfos --- */
 const layerLegends = [
   { title: "Bauzonen", layers: [{ id: "Analysekarte-Bauzonen", items: [
     { label: "WG3", color: "#989dbe" },
@@ -432,13 +582,13 @@ const layerLegends = [
   ]}]}
 ];
 
-/* Legende updaten */
-/* Platz für Quelle unten */
+/* --- Legende updaten --- */
 function adjustLegendPadding() {
   const source = document.getElementById('source-tab');
   const legend = document.getElementById('legend-container');
   legend.style.paddingBottom = source.offsetHeight + 'px';
 }
+
 function updateLegend() {
   const legendList = document.getElementById('legend-list');
   const legendTitle = document.getElementById('legend-title');
@@ -450,7 +600,6 @@ function updateLegend() {
       return ids.some(id => document.getElementById(id).style.display === 'block');
     });
     if (activeLayers.length > 0) {
-      // Gruppenüberschrift
       const liGroup = document.createElement('li');
       liGroup.innerHTML = `<strong>${group.title}</strong>`;
       liGroup.style.marginTop = '6px';
@@ -459,7 +608,6 @@ function updateLegend() {
 
       activeLayers.forEach(layer => {
         layer.items.forEach(item => {
-          // Untertitel
           if (item.subtitle) {
             const liSub = document.createElement('li');
             liSub.textContent = item.label;
@@ -469,7 +617,6 @@ function updateLegend() {
             return;
           }
 
-          // Symbol erstellen
           const li = document.createElement('li');
           let symbol;
 
@@ -509,8 +656,8 @@ function updateLegend() {
   legendTitle.style.display = legendList.children.length > 0 ? 'block' : 'none';
   adjustLegendPadding();
 }
- 
-/* Export Map */
+
+/* --- Export Map --- */
 async function exportVisibleLayers() {
   const mapInner = document.getElementById('map-inner');
   const allLayers = Array.from(mapInner.querySelectorAll('.layer'));
@@ -545,7 +692,7 @@ async function exportVisibleLayers() {
   link.click();
 }
 
-/* Export Legend */
+/* --- Export Legend --- */
 async function exportLegend() {
   const legend = document.getElementById('legend-container');
   const legendList = document.getElementById('legend-list');
@@ -555,21 +702,17 @@ async function exportLegend() {
     return;
   }
 
-  // Clone legend for export with small padding
   const exportWrapper = legend.cloneNode(true);
   exportWrapper.style.position = 'absolute';
-  exportWrapper.style.left = '-1000px'; // move offscreen
+  exportWrapper.style.left = '-1000px';
   exportWrapper.style.top = '0';
-  exportWrapper.style.width = legend.offsetWidth + 4 + 'px'; // +2px left +2px right
+  exportWrapper.style.width = legend.offsetWidth + 4 + 'px';
   exportWrapper.style.padding = '2px';
   exportWrapper.style.height = 'auto';
   exportWrapper.style.backgroundColor = 'white';
   document.body.appendChild(exportWrapper);
 
-  const canvas = await html2canvas(exportWrapper, {
-    backgroundColor: 'white',
-    scale: 4
-  });
+  const canvas = await html2canvas(exportWrapper, { backgroundColor: 'white', scale: 4 });
 
   document.body.removeChild(exportWrapper);
 
@@ -579,16 +722,16 @@ async function exportLegend() {
   link.click();
 }
 
-/* Init */
+/* --- Initialisierung --- */
 document.getElementById('Analysekarte-Basekarte').style.display = 'block';
 document.getElementById('Analysekarte-Glatt').style.display = 'block';
 updateZoomDisplay();
 updateLegend();
+
+// Beim Laden gespeicherte Werte wiederherstellen
+window.addEventListener('load', () => {
+  restoreZoom();
+  restoreLayers();
+  restoreFolders();
+});
 </script>
-</body>
-
-</html>
-
-
-
-
