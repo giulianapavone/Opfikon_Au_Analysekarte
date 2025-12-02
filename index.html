@@ -397,11 +397,11 @@ function zoomDefault() {
 }
 
 function saveZoom() {
-  localStorage.setItem('mapZoom', zoom);
+  sessionStorage.setItem('mapZoom', zoom);
 }
 
 function restoreZoom() {
-  const savedZoom = localStorage.getItem('mapZoom');
+  const savedZoom = sessionStorage.getItem('mapZoom');
   if (savedZoom) {
     zoom = parseInt(savedZoom);
     document.getElementById('map-inner').style.transform = `scale(${zoom / 100})`;
@@ -434,7 +434,14 @@ function clearLayers() {
 function toggleLayer(id, button) {
   const el = document.getElementById(id);
 
-  const exclusiveLayers = ["Analysekarte-Eigentuemer", "Analysekarte-Bauzonen", "Analysekarte-Strassenlaerm", "Analysekarte-Einwohnerdichte", "Analysekarte-Beschaeftigtendichte", "Analysekarte-Geschossflaechenreserven"];
+  const exclusiveLayers = [
+    "Analysekarte-Eigentuemer",
+    "Analysekarte-Bauzonen",
+    "Analysekarte-Strassenlaerm",
+    "Analysekarte-Einwohnerdichte",
+    "Analysekarte-Beschaeftigtendichte",
+    "Analysekarte-Geschossflaechenreserven"
+  ];
 
   if (exclusiveLayers.includes(id)) {
     exclusiveLayers.forEach(layerId => {
@@ -466,11 +473,11 @@ function toggleLayer(id, button) {
 function saveLayers() {
   const activeLayers = Array.from(document.querySelectorAll('#buttons button.active'))
     .map(btn => btn.getAttribute('onclick').match(/'([^']+)'/)[1]);
-  localStorage.setItem('activeLayers', JSON.stringify(activeLayers));
+  sessionStorage.setItem('activeLayers', JSON.stringify(activeLayers));
 }
 
 function restoreLayers() {
-  const activeLayers = JSON.parse(localStorage.getItem('activeLayers') || '[]');
+  const activeLayers = JSON.parse(sessionStorage.getItem('activeLayers') || '[]');
   activeLayers.forEach(id => {
     const layer = document.getElementById(id);
     const button = Array.from(document.querySelectorAll('#buttons button'))
@@ -488,11 +495,11 @@ function saveFolders() {
   const openFolders = Array.from(document.querySelectorAll('#buttons details'))
     .filter(d => d.open)
     .map(d => d.querySelector('summary').textContent.trim());
-  localStorage.setItem('openFolders', JSON.stringify(openFolders));
+  sessionStorage.setItem('openFolders', JSON.stringify(openFolders));
 }
 
 function restoreFolders() {
-  const openFolders = JSON.parse(localStorage.getItem('openFolders') || '[]');
+  const openFolders = JSON.parse(sessionStorage.getItem('openFolders') || '[]');
   document.querySelectorAll('#buttons details').forEach(folder => {
     const title = folder.querySelector('summary').textContent.trim();
     folder.open = openFolders.includes(title);
@@ -502,7 +509,7 @@ function restoreFolders() {
 /* Folder-Status speichern bei Klick */
 document.querySelectorAll('#buttons details summary').forEach(summary => {
   summary.addEventListener('click', () => {
-    setTimeout(saveFolders, 50); // speichern nach Toggle
+    setTimeout(saveFolders, 50);
   });
 });
 
@@ -663,7 +670,10 @@ async function exportVisibleLayers() {
   const allLayers = Array.from(mapInner.querySelectorAll('.layer'));
   const visibleLayers = allLayers.filter(l => l.style.display === 'block');
   
-  visibleLayers.sort((a, b) => (parseInt(getComputedStyle(a).zIndex) || 0) - (parseInt(getComputedStyle(b).zIndex) || 0));
+  visibleLayers.sort((a, b) =>
+    (parseInt(getComputedStyle(a).zIndex) || 0) -
+    (parseInt(getComputedStyle(b).zIndex) || 0)
+  );
 
   const ref = visibleLayers[0];
   const width = ref.naturalWidth;
@@ -680,7 +690,10 @@ async function exportVisibleLayers() {
     await new Promise((resolve, reject) => {
       const img = new Image();
       img.crossOrigin = 'anonymous';
-      img.onload = () => { ctx.drawImage(img, 0, 0, width, height); resolve(); };
+      img.onload = () => {
+        ctx.drawImage(img, 0, 0, width, height);
+        resolve();
+      };
       img.onerror = reject;
       img.src = layer.src;
     });
@@ -728,7 +741,6 @@ document.getElementById('Analysekarte-Glatt').style.display = 'block';
 updateZoomDisplay();
 updateLegend();
 
-// Beim Laden gespeicherte Werte wiederherstellen
 window.addEventListener('load', () => {
   restoreZoom();
   restoreLayers();
